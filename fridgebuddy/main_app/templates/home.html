@@ -1,0 +1,26 @@
+
+{% extends 'base.html' %} 
+{% load static %} 
+
+{% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'css/home.css' %}"
+/>
+{% endblock %} 
+
+{% block content %}
+
+<section class="hero-section">
+  <div class="fridge-container">
+    <img
+      src="{% static 'images/fridgebuddy.png' %}"
+      alt="Fridge Buddy splash image"
+      class="splash-image"
+    />
+  </div>
+  <h1>Welcome to Fridge Buddy</h1>
+  <p>Your smart companion for managing food and reducing waste</p>
+</section>
+
+{% endblock %}

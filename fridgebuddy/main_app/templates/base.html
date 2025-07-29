@@ -1,0 +1,43 @@
+{% load static %}
+<!-- makes any static files available -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Favicon and app icons using fridgebuddy.png -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/fridgebuddy.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/fridgebuddy.png' %}" />
+    <link rel="shortcut icon" href="{% static 'images/fridgebuddy.png' %}" />
+    <link rel="apple-touch-icon" href="{% static 'images/fridgebuddy.png' %}" />
+    
+    <!-- Base styles - loaded on all pages -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+
+    <title>{% block title %}Fridge Buddy{% endblock %}</title>
+    {% block head %} 
+    {% endblock %}
+  </head>
+  <body>
+    <header>
+      <div class="header-logo-container">
+        <a href="/">
+        <img src="{% static 'images/fridgebuddy.png' %}" alt="Fridge Buddy logo" class="header-logo" />
+        </a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="{% url 'food-index' %}">All Foods</a></li>
+          <li><a href="{% url 'food-create' %}">Add a Cat</a></li>
+          <li><a href="{% url 'about' %}">About</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+     {% block content %} 
+     {% endblock %}
+     </main>
+  </body>
+</html>
