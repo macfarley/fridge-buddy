@@ -105,6 +105,32 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="form-errors">
+                                {% for error in form.description.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.image_url.id_for_label }}">Image URL</label>
+                        {{ form.image_url }}
+                        {% if form.image_url.errors %}
+                            <div class="form-errors">
+                                {% for error in form.image_url.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <div class="form-group full-width">
                     <label for="{{ form.notes.id_for_label }}">Notes</label>
                     {{ form.notes }}
@@ -126,15 +152,6 @@
             </form>
         </div>
 
-        <div class="form-tips">
-            <h3>💡 Tips for Better Food Tracking</h3>
-            <ul>
-                <li>Check expiration dates carefully - some foods last longer than printed dates</li>
-                <li>Note the specific location to find items quickly</li>
-                <li>Add quantities to help with meal planning</li>
-                <li>Use notes for special storage instructions or reminders</li>
-            </ul>
-        </div>
     </div>
 </div>
 {% endblock %}

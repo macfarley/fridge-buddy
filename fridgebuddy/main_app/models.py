@@ -6,7 +6,7 @@ from datetime import date, timedelta
 # User model is provided by Django's auth system, with new fields for tracking food preferences and restrictions
 
 # Global catalog of all available food items
-class CatalogItem(models.Model):
+class CatalogFood(models.Model):
     CATEGORY_CHOICES = [
         ('dairy', 'Dairy'),
         ('meat', 'Meat & Poultry'),
@@ -50,7 +50,7 @@ class Container(models.Model):
 # ContainerFood model represents food items in user containers
 class ContainerFood(models.Model):
     container = models.ForeignKey(Container, on_delete=models.CASCADE, related_name='items')
-    catalog_item = models.ForeignKey(CatalogItem, on_delete=models.CASCADE, related_name='container_entries')
+    catalog_food = models.ForeignKey(CatalogFood, on_delete=models.CASCADE, related_name='container_entries')
     quantity = models.PositiveIntegerField(default=1, help_text="Number of this food item in the container")
     added_at = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateField(null=True, blank=True, help_text="Expiration date for this food item in the container")
@@ -58,35 +58,35 @@ class ContainerFood(models.Model):
     is_frozen = models.BooleanField(default=False, help_text="Check if the item is frozen")
 
     class Meta:
-        unique_together = ('container', 'catalog_item')
-        ordering = ['expiration_date', 'catalog_item__name']
-        verbose_name_plural = 'Container items'
+        unique_together = ('container', 'catalog_food')
+        ordering = ['expiration_date', 'catalog_food__name']
+        verbose_name_plural = 'Container Food Items'
 
     def __str__(self):
-        return f"{self.catalog_item.name} in {self.container.name}"
+        return f"{self.catalog_food.name} in {self.container.name}"
 
     def save(self, *args, **kwargs):
         if not self.expiration_date:  # Only set if not already provided
             # Use added_at.date() since we need a date, not datetime
             base_date = self.added_at.date() if self.added_at else date.today()
             
-            if self.catalog_item.category == 'dairy':
+            if self.catalog_food.category == 'dairy':
                 self.expiration_date = base_date + timedelta(weeks=2)
-            elif self.catalog_item.category == 'seafood':
+            elif self.catalog_food.category == 'seafood':
                 self.expiration_date = base_date + timedelta(days=4)
-            elif self.catalog_item.category == 'meat':
+            elif self.catalog_food.category == 'meat':
                 self.expiration_date = base_date + timedelta(weeks=1)
                 if self.is_frozen:
                     self.expiration_date = base_date + timedelta(weeks=26)  # Frozen meat lasts 6 months
-            elif self.catalog_item.category in ['vegetables', 'fruits']:
+            elif self.catalog_food.category in ['vegetables', 'fruits']:
                 self.expiration_date = base_date + timedelta(weeks=1)
-            elif self.catalog_item.category == 'grains':
+            elif self.catalog_food.category == 'grains':
                 self.expiration_date = base_date + timedelta(weeks=4)
-            elif self.catalog_item.category == 'condiments':
+            elif self.catalog_food.category == 'condiments':
                 self.expiration_date = base_date + timedelta(weeks=12)
-            elif self.catalog_item.category == 'beverages':
+            elif self.catalog_food.category == 'beverages':
                 self.expiration_date = base_date + timedelta(weeks=8)
-            elif self.catalog_item.category == 'leftovers':
+            elif self.catalog_food.category == 'leftovers':
                 self.expiration_date = base_date + timedelta(days=3)
             else:
                 self.expiration_date = base_date + timedelta(weeks=4)  # Default for 'other'

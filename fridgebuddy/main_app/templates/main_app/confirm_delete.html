@@ -1,0 +1,15 @@
+{% if is_catalog_food %}
+<p>Are you sure you want to delete the catalog food item "{{ object.name }}"?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'catalog-food-detail' object.pk %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% else %}
+<p>Are you sure you want to delete the food item "{{ object.catalog_item.name }}" from your container?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'container-detail' object.container.pk %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endif %}

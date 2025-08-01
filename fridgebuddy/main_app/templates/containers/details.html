@@ -1,0 +1,32 @@
+{% comment %} This is the container detail view template for displaying the contents of a specific container {% endcomment %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Container Details - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/containers.css' %}" />
+{% endblock %}  
+
+{% block content %}
+<div class="container-detail">
+    <div class="header-section">
+        <h1>{{ container.name }} ({{ container.get_container_type_display }})</h1>
+        <div class="container-actions">
+            <a href="{% url 'container-update' container.pk %}" class="btn btn-outline">Edit Container</a>
+            <a href="{% url 'container-delete' container.pk %}" class="btn btn-danger">Delete Container</a>
+            <a href="{% url 'food-create' %}?container={{ container.pk }}" class="btn btn-primary">+ Add Food Item</a>
+        </div>
+    </div>
+    <div class="food-items-section">
+        <h2>Food Items</h2>
+        {% if container.food_items.count > 0 %}
+            <ul class="food-items-list">
+                {% for food_item in container.food_items.all %}
+                    <li>{{ food_item.name }} - {{ food_item.quantity }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No food items found in this container.</p>
+        {% endif %}
+    </div>

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Containers - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/fridge.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>My Containers</h1>
+        <a href="{% url 'container-create' %}" class="btn btn-primary">+ Add New Container</a>
+    </div>
+
+    {% if container_list %}
+        <div class="container-grid">
+            {% for container in container_list %}
+                <div class="container-card">
+                    <div class="container-header">
+                        <h3>{{ container.name }}</h3>
+                        <span class="container-type">{{ container.get_container_type_display }}</span>
+                    </div>
+                    <div class="container-actions">
+                        <a href="{% url 'container-detail' container.pk %}" class="btn btn-secondary">View Items</a>
+                        <a href="{% url 'container-update' container.pk %}" class="btn btn-outline">Edit</a>
+                        <a href="{% url 'container-delete' container.pk %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No containers yet!</h3>
+            <p>Create your first container to start organizing your food items.</p>
+            <a href="{% url 'container-create' %}" class="btn btn-primary">+ Add Your First Container</a>
+        </div>
+    {% endif %}
+
+    <div class="create-container-section">
+        <h2>Create a New Container</h2>
+        {% include 'main_app/container_form.html' %}
+    </div>
+</div>
+{% endblock %}
