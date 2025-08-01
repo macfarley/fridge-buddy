@@ -49,7 +49,7 @@ class ContainerCreate(CreateView):
     template_name = 'containers/container_form.html'
     # if the container is created, redirect to the container detail page
     def get_success_url(self):
-        return f'/my-foods/{self.object.pk}/'
+        return f'/my-lists/{self.object.pk}/'
 # update a container This will allow users to change the name or type of container
 class ContainerUpdate(UpdateView):
     model = Container
@@ -57,11 +57,40 @@ class ContainerUpdate(UpdateView):
     template_name = 'containers/container_form.html'
     # if the container is updated, redirect to the container detail page
     def get_success_url(self):
-        return f'/my-foods/{self.object.pk}/'
+        return f'/my-lists/{self.object.pk}/'
 # delete a container
 class ContainerDelete(DeleteView):  
     model = Container
     template_name = 'containers/container_confirm_delete.html'
     # if the container is deleted, redirect to the container index
     def get_success_url(self):
-        return '/my-foods/'
+        return '/my-lists/'
+
+# Food CRUD views
+class FoodCreate(CreateView):
+    model = CatalogFood
+    fields = ['name', 'category', 'description', 'image_url']
+    template_name = 'main_app/food_form.html'
+    
+    def get_success_url(self):
+        return f'/food/{self.object.pk}/'
+
+class FoodUpdate(UpdateView):
+    model = CatalogFood
+    fields = ['name', 'category', 'description', 'image_url']
+    template_name = 'main_app/food_form.html'
+    
+    def get_success_url(self):
+        return f'/food/{self.object.pk}/'
+
+class FoodDelete(DeleteView):
+    model = CatalogFood
+    template_name = 'main_app/confirm_delete.html'
+    
+    def get_success_url(self):
+        return '/food-catalog/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_catalog_food'] = True
+        return context

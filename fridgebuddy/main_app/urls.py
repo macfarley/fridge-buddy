@@ -10,25 +10,37 @@ urlpatterns = [
 
     # User-specific routes for managing containers and food items
     # Index of containers
-    path('my-foods/', views.container_index, name='container-index'),
+    path('my-lists/', views.ContainerIndexView.as_view(), name='my-lists'),
     # Index of food in a specific container
-    path('my-foods/<int:container_id>/', views.food_index, name='food-index'),
+    path('my-lists/<int:container_id>/', views.FoodIndexView.as_view(), name='food-index'),
     # Create a new container
-    path('my-foods/create/', views.ContainerCreate.as_view(), name='container-create'),
+    path('my-lists/create/', views.ContainerCreate.as_view(), name='container-create'),
     # Update a container
-    path('my-foods/<int:pk>/update/', views.ContainerUpdate.as_view(), name='container-update'),
+    path('my-lists/<int:pk>/update/', views.ContainerUpdate.as_view(), name='container-update'),
     # Delete a container
-    path('my-foods/<int:pk>/delete/', views.ContainerDelete.as_view(), name='container-delete'),
+    path('my-lists/<int:pk>/delete/', views.ContainerDelete.as_view(), name='container-delete'),
 
     # Global food catalog routes
     # Index of food items catalog
-    path('food-catalog/', views.food_catalog, name='food-catalog'),
+    path('food-catalog/', views.FoodCatalogListView.as_view(), name='food-catalog'),
     # Detail view for a specific food item
-    path('food/<int:food_id>/', views.food_detail, name='food-detail'),
-    path('food/create/', views.FoodCreate.as_view(), name='food-create'),
+    path('food-catalog/<int:pk>/', views.FoodDetailView.as_view(), name='food-detail'),
+    path('food-catalog/create/', views.FoodCreate.as_view(), name='food-create'),
     # change the name, description, etc. of a food item
-    path('food/<int:pk>/update/', views.FoodUpdate.as_view(), name='food-update'),
+    path('food-catalog/<int:pk>/update/', views.FoodUpdate.as_view(), name='food-update'),
     # Delete a food item from the catalog (not from a container) *Danger*
-    path('food/<int:pk>/delete/', views.FoodDelete.as_view(), name='food-delete'),
-   
+    path('food-catalog/<int:pk>/delete/', views.FoodDelete.as_view(), name='food-delete'),
+
+    # Path to user's dashboard (if implemented)
+    # path('dashboard/', views.dashboard, name='dashboard'),  # Optional
+    # Path to User's Container Index
+    # path('my-lists/', views.user_container_index, name='user-container-index'),
+    # Path to single User's Container Detail
+    # path('my-lists/<int:container_id>/', views.user_container_detail, name='user-container-detail'),
+    # Path to create a new container
+    # path('my-lists/create/', views.user_container_create, name='user-container-create'),
+    # Path to change a container's name or type
+    # path('my-lists/<int:container_id>/update/', views.user_container_update, name='user-container-update'),
+    # Path to delete a container
+    # path('my-lists/<int:container_id>/delete/', views.user_container_delete, name='user-container-delete')
 ]

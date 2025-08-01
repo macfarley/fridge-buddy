@@ -23,7 +23,7 @@
                         <span class="container-type">{{ container.get_container_type_display }}</span>
                     </div>
                     <div class="container-actions">
-                        <a href="{% url 'container-detail' container.pk %}" class="btn btn-secondary">View Items</a>
+                        <a href="{% url 'food-index' container.pk %}" class="btn btn-secondary">View Items</a>
                         <a href="{% url 'container-update' container.pk %}" class="btn btn-outline">Edit</a>
                         <a href="{% url 'container-delete' container.pk %}" class="btn btn-danger">Delete</a>
                     </div>

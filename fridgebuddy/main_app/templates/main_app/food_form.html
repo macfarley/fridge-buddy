@@ -13,7 +13,7 @@
 <div class="container">
     <div class="form-container">
         <div class="form-header">
-            <a href="{% url 'food-index' %}" class="back-link">← Back to Fridge</a>
+            <a href="{% url 'my-lists' %}" class="back-link">← Back to Fridge</a>
             <h1>
                 {% if food %}
                     Edit {{ food.name }}
@@ -147,7 +147,7 @@
                     <button type="submit" class="btn btn-primary">
                         {% if food %}Update Food Item{% else %}Add Food Item{% endif %}
                     </button>
-                    <a href="{% url 'food-index' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>
