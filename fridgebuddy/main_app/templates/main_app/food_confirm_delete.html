@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete {{ food.name }} - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="delete-container">
+        <div class="delete-header">
+            <a href="{% url 'food-detail' food.id %}" class="back-link">← Back to {{ food.name }}</a>
+        </div>
+
+        <div class="delete-card">
+            <div class="delete-icon">
+                <span class="warning-icon">⚠️</span>
+            </div>
+            
+            <h1>Delete Food Item</h1>
+            
+            <div class="delete-warning">
+                <p>Are you sure you want to delete <strong>{{ food.name }}</strong> from your fridge?</p>
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+
+            <div class="food-summary">
+                <h3>Item Details:</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <label>Name:</label>
+                        <span>{{ food.name }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <label>Category:</label>
+                        <span>{{ food.category }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <label>Expiration Date:</label>
+                        <span>{{ food.expiration_date }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <label>Quantity:</label>
+                        <span>{{ food.quantity }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="delete-reason">
+                <h3>Why are you removing this item?</h3>
+                <div class="reason-buttons">
+                    <button class="reason-btn" data-reason="consumed">
+                        <span class="reason-icon">✅</span>
+                        <span>Consumed</span>
+                    </button>
+                    <button class="reason-btn" data-reason="expired">
+                        <span class="reason-icon">🗑️</span>
+                        <span>Expired/Spoiled</span>
+                    </button>
+                    <button class="reason-btn" data-reason="other">
+                        <span class="reason-icon">📝</span>
+                        <span>Other Reason</span>
+                    </button>
+                </div>
+            </div>
+
+            <form method="POST" class="delete-form">
+                {% csrf_token %}
+                <input type="hidden" id="delete-reason" name="delete_reason" value="">
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-danger">
+                        Yes, Delete {{ food.name }}
+                    </button>
+                    <a href="{% url 'food-detail' food.id %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="waste-tip">
+            <div class="tip-icon">💡</div>
+            <div class="tip-content">
+                <h4>Reducing Food Waste</h4>
+                <p>Before throwing away food, consider if it can be composted, donated, or used in creative recipes. Even slightly overripe produce can often be used in smoothies, soups, or baking!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reasonButtons = document.querySelectorAll('.reason-btn');
+    const deleteReasonInput = document.getElementById('delete-reason');
+    
+    reasonButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            reasonButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Set the hidden input value
+            deleteReasonInput.value = this.dataset.reason;
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ food.name }} - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/fridge.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="food-detail">
+        <div class="detail-header">
+            <a href="{% url 'food-index' %}" class="back-link">← Back to Fridge</a>
+            <div class="food-actions">
+                <a href="{% url 'food-update' food.id %}" class="btn">Edit</a>
+                <a href="{% url 'food-delete' food.id %}" class="btn btn-secondary">Delete</a>
+            </div>
+        </div>
+
+        <div class="food-detail-card">
+            <div class="food-main-info">
+                <h1>{{ food.name }}</h1>
+                <div class="food-category-badge">{{ food.category }}</div>
+            </div>
+
+            <div class="food-details-grid">
+                <div class="detail-item">
+                    <label>Expiration Date:</label>
+                    <span class="expiration-date {% if food.is_expired %}expired{% elif food.expires_soon %}warning{% endif %}">
+                        {{ food.expiration_date }}
+                    </span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Quantity:</label>
+                    <span>{{ food.quantity }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Location in Fridge:</label>
+                    <span>{{ food.location|default:"Not specified" }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Purchase Date:</label>
+                    <span>{{ food.purchase_date|default:"Not specified" }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Days Until Expiration:</label>
+                    <span class="days-remaining {% if food.is_expired %}expired{% elif food.expires_soon %}warning{% endif %}">
+                        {{ food.days_until_expiration }} days
+                    </span>
+                </div>
+            </div>
+
+            {% if food.notes %}
+            <div class="food-notes">
+                <label>Notes:</label>
+                <p>{{ food.notes }}</p>
+            </div>
+            {% endif %}
+
+            <div class="freshness-indicator">
+                <div class="freshness-bar">
+                    <div class="freshness-fill" style="width: {{ food.freshness_percentage }}%"></div>
+                </div>
+                <p class="freshness-text">
+                    {% if food.is_expired %}
+                        This item has expired
+                    {% elif food.expires_soon %}
+                        Use soon - expires in {{ food.days_until_expiration }} days
+                    {% else %}
+                        Fresh - {{ food.days_until_expiration }} days remaining
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

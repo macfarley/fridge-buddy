@@ -1,0 +1,369 @@
+/* Forms specific styles */
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin: 1rem 0 0 0;
+}
+
+.back-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #0056b3;
+}
+
+.form-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.food-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-errors {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-errors .error {
+    color: #dc3545;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Form Tips Section */
+.form-tips {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border-left: 4px solid #007bff;
+}
+
+.form-tips h3 {
+    color: #495057;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.form-tips ul {
+    color: #6c757d;
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.form-tips li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Delete Confirmation Styles */
+.delete-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.delete-header {
+    margin-bottom: 2rem;
+}
+
+.delete-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.delete-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.warning-icon {
+    color: #ffc107;
+}
+
+.delete-card h1 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.delete-warning {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+}
+
+.delete-warning p {
+    margin: 0.5rem 0;
+    color: #856404;
+}
+
+.warning-text {
+    font-weight: bold;
+    color: #dc3545 !important;
+}
+
+.food-summary {
+    text-align: left;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.food-summary h3 {
+    color: #495057;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summary-item label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.summary-item span {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Delete Reason Selection */
+.delete-reason {
+    margin-bottom: 2rem;
+}
+
+.delete-reason h3 {
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.reason-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.reason-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.reason-btn:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+}
+
+.reason-btn.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.reason-icon {
+    font-size: 1.5rem;
+}
+
+.delete-form {
+    text-align: center;
+}
+
+/* Waste Tip */
+.waste-tip {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    color: #155724;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.tip-content h4 {
+    margin-bottom: 0.5rem;
+    color: #155724;
+}
+
+.tip-content p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container,
+    .delete-container {
+        padding: 1rem;
+    }
+    
+    .form-card,
+    .delete-card {
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .reason-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .waste-tip {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .delete-card h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-card,
+    .delete-card {
+        padding: 1rem;
+    }
+}

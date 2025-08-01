@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if food %}Edit {{ food.name }}{% else %}Add New Food Item{% endif %} - Fridge Buddy
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <a href="{% url 'food-index' %}" class="back-link">← Back to Fridge</a>
+            <h1>
+                {% if food %}
+                    Edit {{ food.name }}
+                {% else %}
+                    Add New Food Item
+                {% endif %}
+            </h1>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" class="food-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Food Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="form-errors">
+                                {% for error in form.name.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="form-errors">
+                                {% for error in form.category.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.expiration_date.id_for_label }}">Expiration Date *</label>
+                        {{ form.expiration_date }}
+                        {% if form.expiration_date.errors %}
+                            <div class="form-errors">
+                                {% for error in form.expiration_date.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.quantity.id_for_label }}">Quantity</label>
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                            <div class="form-errors">
+                                {% for error in form.quantity.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.purchase_date.id_for_label }}">Purchase Date</label>
+                        {{ form.purchase_date }}
+                        {% if form.purchase_date.errors %}
+                            <div class="form-errors">
+                                {% for error in form.purchase_date.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.location.id_for_label }}">Location in Fridge</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="form-errors">
+                                {% for error in form.location.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="{{ form.notes.id_for_label }}">Notes</label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                        <div class="form-errors">
+                            {% for error in form.notes.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        {% if food %}Update Food Item{% else %}Add Food Item{% endif %}
+                    </button>
+                    <a href="{% url 'food-index' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-tips">
+            <h3>💡 Tips for Better Food Tracking</h3>
+            <ul>
+                <li>Check expiration dates carefully - some foods last longer than printed dates</li>
+                <li>Note the specific location to find items quickly</li>
+                <li>Add quantities to help with meal planning</li>
+                <li>Use notes for special storage instructions or reminders</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
