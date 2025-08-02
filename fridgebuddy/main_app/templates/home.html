@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %} 
 {% load static %} 
 
@@ -22,6 +21,16 @@
   <h1>Welcome to Fridge Buddy</h1>
   <p>Your smart companion for managing food and reducing waste</p>
   <p>Just add your food items and let Fridge Buddy help you keep track!</p>
+</section>
+
+<section class="auth-section">
+  {% if not user_authenticated %}
+    <div class="auth-panel">
+      <h2>Sign In or Sign Up</h2>
+      <a href="/accounts/login/" class="btn btn-primary">Sign In</a>
+      <a href="/accounts/signup/" class="btn btn-secondary">Sign Up</a>
+    </div>
+  {% endif %}
 </section>
 
 {% endblock %}

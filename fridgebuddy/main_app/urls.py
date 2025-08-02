@@ -1,6 +1,10 @@
+# This file defines URL patterns for the main application of the FridgeBuddy project.
+# Import path to define URL routes
 from django.urls import path
 # Import views to connect routes to view functions
-from . import views 
+from . import views
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     # Define the landing page route
@@ -42,5 +46,13 @@ urlpatterns = [
     # Path to change a container's name or type
     # path('my-lists/<int:container_id>/update/', views.user_container_update, name='user-container-update'),
     # Path to delete a container
-    # path('my-lists/<int:container_id>/delete/', views.user_container_delete, name='user-container-delete')
+    # path('my-lists/<int:container_id>/delete/', views.user_container_delete, name='user-container-delete'),
+
+    # Authentication routes
+    # Login route
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    # Logout route
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # Sign-up route (if using a custom view, replace with your view)
+    path('accounts/signup/', views.signup, name='signup'),
 ]

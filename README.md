@@ -147,6 +147,18 @@ fridge-buddy/
    - Keyboard shortcuts for power users
    - Export/import functionality for data backup
 
+## Stretch Goals (Post-MVP)
+
+### 🎯 Advanced Drag-and-Drop Interface
+**Offline Batch Move Workflow** - Allow users to drag and drop items between containers with optimistic UI updates, queuing all moves locally and persisting them in a single batch API call when user hits "Save". This would provide:
+- **Seamless UX**: Immediate visual feedback without network delays
+- **Offline Capability**: Queue moves even without internet connection
+- **Efficient Network Usage**: Single atomic transaction for multiple moves
+- **Enhanced Mobile Experience**: Touch-friendly drag interactions
+- **Undo/Redo Support**: Local state management for rollback functionality
+
+Implementation would involve client-side state management (vanilla JS or React), visual drop zone indicators, localStorage persistence for offline edits, and a Django batch-move API endpoint with transaction safety.
+
 ## Contributing
 This is a learning project, but suggestions and improvements are welcome! Please feel free to:
 - Report bugs or issues

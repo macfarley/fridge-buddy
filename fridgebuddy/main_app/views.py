@@ -8,14 +8,19 @@ from django.http import HttpResponse
 from django.views.generic import ListView, DetailView,CreateView, UpdateView, DeleteView
 # Import models to interact with the database
 from .models import Container, CatalogFood, ContainerFood
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Define the landing page view function
 def home(request):
-    # Render the landing page template
-    return render(request, 'home.html')
+    # Render the landing page template with user authentication context
+    context = {
+        'user_authenticated': request.user.is_authenticated
+    }
+    return render(request, 'home.html', context)
 # Define the about page
 def about(request):
     return render(request, 'about.html')
+
 
 # Food-related view functions
 # Class-based views for food items
@@ -33,36 +38,52 @@ class FoodDetailView(DetailView):
 
 # Container-related view functions
 # Define the container index view function
-class ContainerIndexView(ListView):
+class ContainerIndexView(LoginRequiredMixin, ListView):
     model = Container
     template_name = 'containers/index.html'
     context_object_name = 'container_list'
+
+    def get_queryset(self):
+        return Container.objects.filter(owner=self.request.user)
 # Define the food index view function for a specific container
-class FoodIndexView(ListView):
+class FoodIndexView(LoginRequiredMixin, ListView):
     model = ContainerFood
     template_name = 'food/index.html'
     context_object_name = 'food_list'
+
+    def get_queryset(self):
+        return ContainerFood.objects.filter(container__owner=self.request.user)
 # create a new container
-class ContainerCreate(CreateView):
+class ContainerCreate(LoginRequiredMixin, CreateView):
     model = Container
     fields = ['name', 'container_type']
     template_name = 'containers/container_form.html'
-    # if the container is created, redirect to the container detail page
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
     def get_success_url(self):
         return f'/my-lists/{self.object.pk}/'
 # update a container This will allow users to change the name or type of container
-class ContainerUpdate(UpdateView):
+class ContainerUpdate(LoginRequiredMixin, UpdateView):
     model = Container
     fields = ['name', 'container_type']
     template_name = 'containers/container_form.html'
-    # if the container is updated, redirect to the container detail page
+
+    def get_queryset(self):
+        return Container.objects.filter(owner=self.request.user)
+
     def get_success_url(self):
         return f'/my-lists/{self.object.pk}/'
 # delete a container
-class ContainerDelete(DeleteView):  
+class ContainerDelete(LoginRequiredMixin, DeleteView):  
     model = Container
     template_name = 'containers/container_confirm_delete.html'
-    # if the container is deleted, redirect to the container index
+
+    def get_queryset(self):
+        return Container.objects.filter(owner=self.request.user)
+
     def get_success_url(self):
         return '/my-lists/'
 
