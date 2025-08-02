@@ -1,14 +1,22 @@
 # main_app/views.py
 # This is where we define the view functions for our application
 # Import render to render templates
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # Import HttpResponse to send text-based responses
 from django.http import HttpResponse
-# Class-based views for creating, updating, and deleting containers and food items
-from django.views.generic import ListView, DetailView,CreateView, UpdateView, DeleteView
-# Import models to interact with the database
-from .models import Container, CatalogFood, ContainerFood
+
+# Django class-based views and mixins
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+# Django authentication and forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+
+# Forms and models
+from django import forms
+from .models import Profile, Container, CatalogFood, ContainerFood
 
 # Define the landing page view function
 def home(request):
@@ -115,3 +123,45 @@ class FoodDelete(DeleteView):
         context = super().get_context_data(**kwargs)
         context['is_catalog_food'] = True
         return context
+
+# Custom signup form combining User and Profile fields
+class CustomSignupForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30, required=False, help_text="Optional.")
+    last_name = forms.CharField(max_length=30, required=False, help_text="Optional.")
+    email = forms.EmailField(max_length=254, help_text="Required. Enter a valid email address.")
+    birthday = forms.DateField(required=False, help_text="Optional. Enter your birthday.")
+    profile_image = forms.ImageField(required=False, help_text="Optional. Upload a profile image (JPG, max 15MB).")
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            Profile.objects.create(
+                user=user,
+                birthday=self.cleaned_data['birthday'],
+                profile_image=self.cleaned_data['profile_image']
+            )
+        return user
+
+# Signup view for user registration
+def signup(request):
+    if request.method == 'POST':
+        form = CustomSignupForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    else:
+        form = CustomSignupForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+# Dashboard view for authenticated users
+@login_required
+def dashboard(request):
+    return render(request, 'dashboard.html', {'user': request.user})

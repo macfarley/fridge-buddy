@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Fridge Buddy{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1>Sign Up</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Log in here</a>.</p>
+    </div>
+</div>
+{% endblock %}

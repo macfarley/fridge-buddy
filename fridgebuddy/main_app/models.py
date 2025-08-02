@@ -9,10 +9,21 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 # Importing date and timedelta for handling expiration dates.
 from datetime import date, timedelta
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # User model is provided by Django's auth system
 # out of the box User contains username, email, password, first_name, last_name
 # We will extend it via ForeignKey relationships in other models.
+
+# Extend the User model with a Profile model
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    birthday = models.DateField(null=True, blank=True, help_text="User's birthday (month and day only)")
+    #profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True, help_text="Profile image (JPG, max 15MB)")
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
 
 # Global catalog of all available food items
 class CatalogFood(models.Model):
@@ -144,3 +155,16 @@ class ContainerFood(models.Model):
         elif self.expires_soon:
             return 'warning'
         return 'fresh'
+
+# Signal to create default containers when a new user is created
+@receiver(post_save, sender=User)
+def create_default_containers(sender, instance, created, **kwargs):
+    if created:  # Only create containers for new users
+        default_containers = [
+            {'name': 'Fridge', 'container_type': 'FRIDGE'},
+            {'name': 'Freezer', 'container_type': 'FREEZER'},
+            {'name': 'Pantry', 'container_type': 'PANTRY'},
+            {'name': 'Shopping List', 'container_type': 'SHOPPING'},
+        ]
+        for container in default_containers:
+            Container.objects.create(owner=instance, **container)

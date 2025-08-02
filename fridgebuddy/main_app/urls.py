@@ -35,19 +35,7 @@ urlpatterns = [
     # Delete a food item from the catalog (not from a container) *Danger*
     path('food-catalog/<int:pk>/delete/', views.FoodDelete.as_view(), name='food-delete'),
 
-    # Path to user's dashboard (if implemented)
-    # path('dashboard/', views.dashboard, name='dashboard'),  # Optional
-    # Path to User's Container Index
-    # path('my-lists/', views.user_container_index, name='user-container-index'),
-    # Path to single User's Container Detail
-    # path('my-lists/<int:container_id>/', views.user_container_detail, name='user-container-detail'),
-    # Path to create a new container
-    # path('my-lists/create/', views.user_container_create, name='user-container-create'),
-    # Path to change a container's name or type
-    # path('my-lists/<int:container_id>/update/', views.user_container_update, name='user-container-update'),
-    # Path to delete a container
-    # path('my-lists/<int:container_id>/delete/', views.user_container_delete, name='user-container-delete'),
-
+  
     # Authentication routes
     # Login route
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
@@ -55,4 +43,7 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     # Sign-up route (if using a custom view, replace with your view)
     path('accounts/signup/', views.signup, name='signup'),
+    # Path to user's dashboard (if implemented)
+    path('accounts/dashboard/', views.dashboard, name='dashboard'),
+
 ]

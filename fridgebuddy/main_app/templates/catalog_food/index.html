@@ -10,25 +10,87 @@
   <h1>All Foods</h1>
   <div class="food-catalog">
     {% if foods %}
-      <ul class="food-list">
-        {% for food in foods %}
-          <li class="food-item">
-            <h2><a href="{% url 'food-detail' food.pk %}">{{ food.name }}</a></h2>
-            <p>Category: {{ food.category }}</p>
-            <p>Expiration Date: {{ food.expiration_date }}</p>
-            <p>Quantity: {{ food.quantity }}</p>
-            <p>Container: 
-              {% if food.container %}
-                <a href="{% url 'container-detail' food.container.pk %}">{{ food.container.name }}</a>
-              {% else %}
-                None
-              {% endif %}
-            </p>
+      {% regroup foods by category as category_list %} <!-- Group foods by their category -->
+      <ul class="category-list">
+        {% for category in category_list %}
+          <li class="category-item">
+            <!-- Category header that toggles visibility of the food list -->
+            <h2 class="category-header" onclick="toggleCategory('{{ category.grouper }}')">
+              {{ category.grouper }}
+            </h2>
+            <ul id="category-{{ category.grouper }}" class="food-list" style="display: none;">
+              {% for food in category.list %}
+                <li class="food-item">
+                  <!-- Checkbox for selecting food items for batch actions -->
+                  <input type="checkbox" class="food-checkbox" data-food-id="{{ food.pk }}">
+                  <h3>{{ food.name }}</h3>
+                  <p>Expiration Date: {{ food.expiration_date }}</p>
+                  <p>Quantity: {{ food.quantity }}</p>
+                  <p>Container: 
+                    {% if food.container %}
+                      <!-- Link to the container details if the food is in a container -->
+                      <a href="{% url 'container-detail' food.container.pk %}">{{ food.container.name }}</a>
+                    {% else %}
+                      None
+                    {% endif %}
+                  </p>
+                  {% if user.is_authenticated %}
+                    <!-- Dropdown for selecting a container to add the food to -->
+                    <select class="container-select" data-food-id="{{ food.pk }}">
+                      <option value="">Select Container</option>
+                      {% for container in user.container_set.all %}
+                        <option value="{{ container.pk }}">{{ container.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <!-- Button to add the food to the selected container -->
+                    <button class="add-to-container-btn" data-food-id="{{ food.pk }}">Add</button>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
           </li>
         {% endfor %}
       </ul>
+      {% if user.is_authenticated %}
+        <!-- Button to add all selected foods to the shopping list -->
+        <button id="batch-add-btn">Add Selected to Shopping List</button>
+      {% endif %}
     {% else %}
       <p>No foods available in the catalog yet.</p>
     {% endif %}
   </div>
+
+  <div class="add-food-section">
+    <!-- Section for adding a new food item -->
+    <h2>Don't see something you like? Add it here:</h2>
+    <a href="{% url 'food-create' %}" class="btn btn-primary">Add New Food</a>
+  </div>
+
+  <script>
+    // Function to toggle the visibility of a category's food list
+    function toggleCategory(category) {
+      const list = document.getElementById(`category-${category}`);
+      list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Event listener for the batch add button
+    document.getElementById('batch-add-btn')?.addEventListener('click', () => {
+      // Collect all selected food items by their IDs
+      const selectedFoods = Array.from(document.querySelectorAll('.food-checkbox:checked'))
+        .map(checkbox => checkbox.dataset.foodId);
+      // Log the selected food IDs (replace with server call for actual implementation)
+      console.log('Batch Add:', selectedFoods);
+    });
+
+    // Add event listeners for each "Add to Container" button
+    document.querySelectorAll('.add-to-container-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        // Get the food ID and selected container ID
+        const foodId = button.dataset.foodId;
+        const containerId = document.querySelector(`.container-select[data-food-id="${foodId}"]`).value;
+        // Log the food and container IDs (replace with server call for actual implementation)
+        console.log('Add to Container:', { foodId, containerId });
+      });
+    });
+  </script>
 {% endblock %}

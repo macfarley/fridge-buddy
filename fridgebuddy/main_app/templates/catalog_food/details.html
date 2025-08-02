@@ -1,1 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Food Details - Fridge Buddy{% endblock %}
+{% load static %}
 {% comment %} Food Details Template {% endcomment %}
+{% block head %}
+  <link rel="icon" type="image/x-icon" href="{% static 'images/fridgebuddy.ico' %}" />
+{% endblock %}
+
+{% block content %}
+  <h1>{{ food.name }}</h1>
+  <div class="food-details">
+    <p><strong>Expiration Date:</strong> {{ food.expiration_date }}</p>
+    <p><strong>Quantity:</strong> {{ food.quantity }}</p>
+    <p><strong>Category:</strong> {{ food.category }}</p>
+    <p><strong>Description:</strong> {{ food.description }}</p>
+    <p><strong>Container:</strong> 
+      {% if food.container %}
+        <a href="{% url 'container-detail' food.container.pk %}">{{ food.container.name }}</a>
+      {% else %}
+        None
+      {% endif %}
+    </p>
+    
+    {% if user.is_authenticated %}
+      <!-- Dropdown for selecting a container to move the food to -->
+      <select class="container-select" data-food-id="{{ food.pk }}">
+        <option value="">Select Container</option>
+        {% for container in user.container_set.all %}
+          <option value="{{ container.pk }}">{{ container.name }}</option>
+        {% endfor %}
+      </select>
+      <!-- Button to move the food to the selected container -->
+      <button class="move-to-container-btn" data-food-id="{{ food.pk }}">Move</button>
+    {% endif %}
+  </div>
+
+  <!-- Back button to return to the catalog -->
+  <a href="{% url 'food-index' %}" class="btn btn-secondary">Back to Catalog</a>
+{% endblock %}
+

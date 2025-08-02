@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% comment %} This template handles the creation and editing of food items in the fridge. {% endcomment %}
 {% block title %}
+    {% comment %} Dynamically set the page title based on whether the user is adding or editing a food item {% endcomment %}
     {% if food %}Edit {{ food.name }}{% else %}Add New Food Item{% endif %} - Fridge Buddy
 {% endblock %}
 
@@ -15,6 +16,7 @@
         <div class="form-header">
             <a href="{% url 'my-lists' %}" class="back-link">← Back to Fridge</a>
             <h1>
+                {% comment %} Display appropriate heading based on whether the user is adding or editing a food item {% endcomment %}
                 {% if food %}
                     Edit {{ food.name }}
                 {% else %}
@@ -25,12 +27,12 @@
 
         <div class="form-card">
             <form method="POST" class="food-form">
-                {% csrf_token %}
-                
+                {% csrf_token %} <!-- Security token for form submission -->
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.name.id_for_label }}">Food Name *</label>
-                        {{ form.name }}
+                        {{ form.name }} <!-- Input field for food name -->
                         {% if form.name.errors %}
                             <div class="form-errors">
                                 {% for error in form.name.errors %}
@@ -42,7 +44,7 @@
 
                     <div class="form-group">
                         <label for="{{ form.category.id_for_label }}">Category</label>
-                        {{ form.category }}
+                        {{ form.category }} <!-- Dropdown for selecting food category -->
                         {% if form.category.errors %}
                             <div class="form-errors">
                                 {% for error in form.category.errors %}
@@ -56,7 +58,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.expiration_date.id_for_label }}">Expiration Date *</label>
-                        {{ form.expiration_date }}
+                        {{ form.expiration_date }} <!-- Input field for expiration date -->
                         {% if form.expiration_date.errors %}
                             <div class="form-errors">
                                 {% for error in form.expiration_date.errors %}
@@ -68,7 +70,7 @@
 
                     <div class="form-group">
                         <label for="{{ form.quantity.id_for_label }}">Quantity</label>
-                        {{ form.quantity }}
+                        {{ form.quantity }} <!-- Input field for quantity -->
                         {% if form.quantity.errors %}
                             <div class="form-errors">
                                 {% for error in form.quantity.errors %}
@@ -143,8 +145,29 @@
                     {% endif %}
                 </div>
 
+                <div class="form-group">
+                    <input type="checkbox" id="add-to-list" name="add_to_list">
+                    <label for="add-to-list">Add this item to one of your lists?</label>
+                    <select id="list-select" name="list_id" disabled>
+                        <option value="">Select a list</option>
+                        {% comment %} Populate dropdown with user's available containers {% endcomment %}
+                        {% for container in user.container_set.all %}
+                            <option value="{{ container.pk }}">{{ container.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <script>
+                    // Enable or disable the dropdown based on the checkbox state
+                    document.getElementById('add-to-list').addEventListener('change', function() {
+                        const listSelect = document.getElementById('list-select');
+                        listSelect.disabled = !this.checked;
+                    });
+                </script>
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
+                        {% comment %} Set button text based on whether the user is adding or editing {% endcomment %}
                         {% if food %}Update Food Item{% else %}Add Food Item{% endif %}
                     </button>
                     <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
