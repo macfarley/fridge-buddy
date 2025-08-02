@@ -7,6 +7,13 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
+    # Authentication/User-related URLs
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('accounts/signup/', views.signup, name='signup'),
+    path('accounts/dashboard/', views.dashboard, name='dashboard'),
+    path('update-profile/', views.update_profile, name='update-profile'),
+
     # Define the landing page route
     path('', views.home, name='home'),
     # Define the about page route
@@ -35,15 +42,5 @@ urlpatterns = [
     # Delete a food item from the catalog (not from a container) *Danger*
     path('food-catalog/<int:pk>/delete/', views.FoodDelete.as_view(), name='food-delete'),
 
-  
-    # Authentication routes
-    # Login route
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    # Logout route
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-    # Sign-up route (if using a custom view, replace with your view)
-    path('accounts/signup/', views.signup, name='signup'),
-    # Path to user's dashboard (if implemented)
-    path('accounts/dashboard/', views.dashboard, name='dashboard'),
 
 ]

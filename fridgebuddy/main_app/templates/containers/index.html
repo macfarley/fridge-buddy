@@ -11,7 +11,42 @@
 <div class="container">
     <div class="header-section">
         <h1>My Containers</h1>
-        <a href="{% url 'container-create' %}" class="btn btn-primary">+ Add New Container</a>
+    </div>
+
+    <!-- Quick Add Container Form -->
+    <div class="quick-add-section">
+        <h2>Add New Container</h2>
+        <form method="post" class="inline-container-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="form-errors">
+                            {% for error in form.name.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.container_type.id_for_label }}">Type</label>
+                    {{ form.container_type }}
+                    {% if form.container_type.errors %}
+                        <div class="form-errors">
+                            {% for error in form.container_type.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Add Container</button>
+                </div>
+            </div>
+        </form>
     </div>
 
     {% if container_list %}
@@ -33,14 +68,8 @@
     {% else %}
         <div class="empty-state">
             <h3>No containers yet!</h3>
-            <p>Create your first container to start organizing your food items.</p>
-            <a href="{% url 'container-create' %}" class="btn btn-primary">+ Add Your First Container</a>
+            <p>Use the form above to create your first container and start organizing your food items.</p>
         </div>
     {% endif %}
-
-    <div class="create-container-section">
-        <h2>Create a New Container</h2>
-        {% include 'main_app/container_form.html' %}
-    </div>
 </div>
 {% endblock %}

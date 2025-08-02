@@ -1,11 +1,199 @@
-{% comment %} This is the container detail view template for displaying the contents of a specific container {% endcomment %}
+
+
 {% extends 'base.html' %}
 {% load static %}
+{% comment %} 
+Container Detail View Template with Interactive Batch Operations
 
-{% block title %}Container Details - Fridge Buddy{% endblock %}
+This template provides a comprehensive interface for managing food items within a container.
+
+Key Interactive Features:
+1. Batch Operations: Select multiple items for bulk actions (move/delete)
+2. Quantity Management: Adjust quantities with +/- buttons
+3. Live Feedback: Real-time counters for selections and changes
+4. Visual Status: Color-coded expiration indicators
+
+JavaScript Functionality:
+- Checkbox selection with "Select All" capability
+- Dynamic visibility of operation bars based on user actions
+- Quantity tracking with change detection
+- Confirmation dialogs for destructive actions
+{% endcomment %}
+{% block title %}{{ container.name }} - Container Details{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/containers.css' %}" />
+<link rel="stylesheet" href="{% static 'css/fridge.css' %}" />
+<style>
+/*
+INTERACTIVE CONTAINER DETAILS STYLING
+
+This CSS provides styling for the interactive elements in the container details view.
+It focuses on user experience with clear visual hierarchy and interactive feedback.
+
+Key Design Principles:
+1. Visual Feedback: Hover states and color coding for status
+2. Accessibility: Clear contrast and readable fonts
+3. Responsive Layout: Flexible grid system for different screen sizes
+4. Interactive Elements: Styled buttons and controls for touch/click
+*/
+
+/* =============================================================================
+   DYNAMIC OPERATION BARS
+   ============================================================================= */
+
+/* 
+BATCH OPERATIONS & QUANTITY CHANGES BARS
+These bars appear dynamically when users have selections or pending changes.
+Styled to be prominent but not overwhelming.
+*/
+.batch-operations, .quantity-changes {
+    background: #f8f9fa;              /* Light background for subtle prominence */
+    border: 1px solid #dee2e6;       /* Soft border for definition */
+    border-radius: 8px;              /* Rounded corners for modern look */
+    padding: 1rem;                   /* Comfortable spacing */
+    margin: 1rem 0;                  /* Vertical separation from content */
+    display: flex;                   /* Flexible layout for responsiveness */
+    justify-content: space-between;  /* Spread info and actions apart */
+    align-items: center;             /* Vertically center content */
+}
+
+/* Action button groups within the operation bars */
+.batch-actions, .changes-actions {
+    display: flex;                   /* Horizontal button layout */
+    gap: 0.5rem;                    /* Consistent spacing between buttons */
+    align-items: center;             /* Align buttons vertically */
+}
+
+/* =============================================================================
+   FOOD ITEM CARDS
+   ============================================================================= */
+
+/* 
+INDIVIDUAL FOOD ITEM STYLING
+Each card represents one food item with interactive elements.
+Positioned relatively to allow absolute positioning of checkboxes.
+*/
+.food-item-card {
+    position: relative;              /* Allow absolute positioning of children */
+    border: 1px solid #dee2e6;     /* Consistent border with operation bars */
+    border-radius: 8px;             /* Matching rounded corners */
+    padding: 1rem;                  /* Comfortable internal spacing */
+    margin-bottom: 1rem;            /* Vertical separation between cards */
+}
+
+/* Checkbox positioning for easy access without interfering with content */
+.food-item-checkbox {
+    position: absolute;              /* Position independently of content flow */
+    top: 0.5rem;                    /* Small offset from top edge */
+    left: 0.5rem;                   /* Small offset from left edge */
+}
+
+/* Header section with title and bulk selection control */
+.section-header {
+    display: flex;                   /* Flexible layout */
+    justify-content: space-between;  /* Title left, controls right */
+    align-items: center;             /* Vertically center elements */
+    margin-bottom: 1rem;            /* Space before food items */
+}
+
+/* =============================================================================
+   QUANTITY CONTROLS
+   ============================================================================= */
+
+/* 
+INTERACTIVE QUANTITY ADJUSTMENT
+Provides intuitive +/- controls for modifying quantities.
+Designed for both mouse and touch interaction.
+*/
+.quantity-controls {
+    display: flex;                   /* Horizontal layout for label and controls */
+    align-items: center;             /* Vertically center all elements */
+    gap: 0.5rem;                    /* Spacing between label and controls */
+    margin-bottom: 0.5rem;          /* Space before next detail item */
+}
+
+/* Container for the +/- buttons and quantity display */
+.quantity-adjuster {
+    display: flex;                   /* Horizontal button layout */
+    align-items: center;             /* Vertically center elements */
+    gap: 0.5rem;                    /* Consistent spacing */
+}
+
+/* 
+QUANTITY ADJUSTMENT BUTTONS
+Styled for clear interaction feedback and accessibility.
+Sized for easy touch/click targeting.
+*/
+.qty-btn {
+    background: #007bff;             /* Primary blue for action buttons */
+    color: white;                    /* High contrast text */
+    border: none;                    /* Clean, borderless design */
+    border-radius: 4px;             /* Slightly rounded for softness */
+    width: 24px;                    /* Fixed size for consistency */
+    height: 24px;                   /* Square aspect ratio */
+    display: flex;                   /* Center the icon/text */
+    align-items: center;             /* Vertical centering */
+    justify-content: center;         /* Horizontal centering */
+    cursor: pointer;                 /* Indicate interactivity */
+    font-size: 14px;               /* Readable icon size */
+    font-weight: bold;              /* Strong visual presence */
+}
+
+/* Hover state for better user feedback */
+.qty-btn:hover {
+    background: #0056b3;            /* Darker blue on hover */
+}
+
+/* Quantity display styling for readability */
+.quantity-display {
+    min-width: 30px;                /* Prevent layout shift with different numbers */
+    text-align: center;             /* Center the number */
+    font-weight: bold;              /* Emphasize the current value */
+}
+
+/* =============================================================================
+   STATUS INDICATORS & VISUAL FEEDBACK
+   ============================================================================= */
+
+/* 
+EXPIRATION STATUS COLOR CODING
+Visual indicators for food freshness using color-coded left borders.
+Provides immediate visual feedback about food status.
+*/
+.food-item-card.expired { 
+    border-left: 4px solid #dc3545;  /* Red border for expired items */
+}
+.food-item-card.warning { 
+    border-left: 4px solid #ffc107;  /* Yellow border for expiring soon */
+}
+.food-item-card.fresh { 
+    border-left: 4px solid #28a745;  /* Green border for fresh items */
+}
+
+/* Text color coding to match border indicators */
+.expired { 
+    color: #dc3545;                  /* Red text for expired status */
+}
+.warning { 
+    color: #856404;                  /* Dark yellow for warning text */
+}
+.fresh { 
+    color: #155724;                  /* Dark green for fresh status */
+}
+
+/* 
+SPECIAL STATUS TAGS
+Small badges for additional food properties like frozen status.
+Styled to be informative but not distracting.
+*/
+.frozen-tag { 
+    background: #e3f2fd;            /* Light blue background */
+    color: #1565c0;                 /* Dark blue text for contrast */
+    padding: 2px 6px;               /* Compact padding */
+    border-radius: 4px;             /* Rounded corners */
+    font-size: 0.8em;              /* Smaller than regular text */
+}
+</style>
 {% endblock %}  
 
 {% block content %}
@@ -18,15 +206,558 @@
             <a href="{% url 'food-create' %}?container={{ container.pk }}" class="btn btn-primary">+ Add Food Item</a>
         </div>
     </div>
-    <div class="food-items-section">
-        <h2>Food Items</h2>
-        {% if container.food_items.count > 0 %}
-            <ul class="food-items-list">
-                {% for food_item in container.food_items.all %}
-                    <li>{{ food_item.name }} - {{ food_item.quantity }}</li>
+
+    <!-- 
+    BATCH OPERATIONS BAR
+    
+    This section appears dynamically when users select items via checkboxes.
+    It provides bulk actions for managing multiple food items at once.
+    
+    Features:
+    - Live counter showing number of selected items
+    - Dropdown to select destination container for moves
+    - Batch move and remove operations
+    - Clear selection functionality
+    
+    JavaScript Integration:
+    - Visibility controlled by updateBatchOperations() function
+    - Shows/hides based on selectedItems Set size
+    -->
+    <div class="batch-operations" id="batch-operations" style="display: none;">
+        <div class="batch-info">
+            <span id="selected-count">0</span> items selected
+        </div>
+        <div class="batch-actions">
+            <!-- Dropdown populated with user's other containers -->
+            <select id="move-to-container" class="form-select">
+                <option value="">Move to...</option>
+                {% for other_container in user.containers.all %}
+                    {% if other_container.pk != container.pk %}
+                        <option value="{{ other_container.pk }}">{{ other_container.name }}</option>
+                    {% endif %}
                 {% endfor %}
-            </ul>
+            </select>
+            <button type="button" class="btn btn-primary" onclick="batchMoveItems()">Move Selected</button>
+            <button type="button" class="btn btn-danger" onclick="batchRemoveItems()">Remove Selected</button>
+            <button type="button" class="btn btn-secondary" onclick="clearSelection()">Clear Selection</button>
+        </div>
+    </div>
+
+    <!-- 
+    QUANTITY CHANGES COUNTER
+    
+    This section appears when users modify quantities using +/- buttons.
+    It tracks pending changes and provides save/reset functionality.
+    
+    Features:
+    - Live counter showing number of items with quantity changes
+    - Save button to apply all changes at once
+    - Reset button to revert to original quantities
+    
+    JavaScript Integration:
+    - Visibility controlled by updateQuantityChanges() function
+    - Tracks changes in quantityChanges object
+    -->
+    <div class="quantity-changes" id="quantity-changes" style="display: none;">
+        <div class="changes-info">
+            <span id="changes-count">0</span> quantity changes pending
+        </div>
+        <div class="changes-actions">
+            <button type="button" class="btn btn-success" onclick="saveQuantityChanges()">Save Changes</button>
+            <button type="button" class="btn btn-secondary" onclick="resetQuantities()">Reset</button>
+        </div>
+    </div>
+    <!-- 
+    FOOD ITEMS SECTION
+    
+    Main content area displaying all food items in the container.
+    Each item card includes interactive elements for selection and quantity management.
+    -->
+    <div class="food-items-section">
+        <div class="section-header">
+            <h2>Food Items</h2>
+            {% if food_items %}
+                <!-- 
+                BULK SELECTION CONTROL
+                Master checkbox that selects/deselects all items at once.
+                JavaScript handles the logic for updating individual checkboxes.
+                -->
+                <div class="bulk-select">
+                    <label>
+                        <input type="checkbox" id="select-all"> Select All
+                    </label>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if food_items %}
+            <div class="food-items-grid">
+                {% for food_item in food_items %}
+                    <!-- 
+                    INDIVIDUAL FOOD ITEM CARD
+                    
+                    Each card represents one food item with:
+                    - Selection checkbox for batch operations
+                    - Quantity controls with +/- buttons
+                    - Expiration status visual indicators
+                    - Individual action buttons
+                    
+                    CSS Classes:
+                    - {{ food_item.status_class }}: Adds color coding (expired/warning/fresh)
+                    - data-item-id: Used by JavaScript for tracking selections and changes
+                    -->
+                    <div class="food-item-card {{ food_item.status_class }}" data-item-id="{{ food_item.pk }}">
+                        
+                        <!-- SELECTION CHECKBOX: Positioned top-left for easy access -->
+                        <div class="food-item-checkbox">
+                            <input type="checkbox" class="item-select" data-item-id="{{ food_item.pk }}">
+                        </div>
+                        
+                        <!-- ITEM HEADER: Food name and category -->
+                        <div class="food-item-header">
+                            <h3>{{ food_item.catalog_food.name }}</h3>
+                            <span class="food-category">{{ food_item.catalog_food.get_category_display }}</span>
+                        </div>
+                        
+                        <!-- ITEM DETAILS: Quantity controls and metadata -->
+                        <div class="food-item-details">
+                            <!-- 
+                            INTERACTIVE QUANTITY CONTROLS
+                            
+                            Features:
+                            - Minus button (decreases quantity, minimum 0)
+                            - Current quantity display (updates live)
+                            - Plus button (increases quantity)
+                            - Data attributes for JavaScript tracking
+                            
+                            JavaScript Integration:
+                            - onclick handlers call adjustQuantity() function
+                            - data-original attribute tracks initial quantity for change detection
+                            - id format: qty-{item_id} for easy DOM manipulation
+                            -->
+                            <div class="quantity-controls">
+                                <label><strong>Quantity:</strong></label>
+                                <div class="quantity-adjuster">
+                                    <button type="button" class="qty-btn minus" onclick="adjustQuantity({{ food_item.pk }}, -1)">−</button>
+                                    <span class="quantity-display" id="qty-{{ food_item.pk }}" data-original="{{ food_item.quantity }}">{{ food_item.quantity }}</span>
+                                    <button type="button" class="qty-btn plus" onclick="adjustQuantity({{ food_item.pk }}, 1)">+</button>
+                                </div>
+                            </div>
+                            
+                            <!-- METADATA: Dates and status information -->
+                            <p><strong>Added:</strong> {{ food_item.added_at|date:"M d, Y" }}</p>
+                            {% if food_item.expiration_date %}
+                                <p><strong>Expires:</strong> {{ food_item.expiration_date|date:"M d, Y" }}</p>
+                                {% if food_item.days_until_expiration %}
+                                    <!-- 
+                                    EXPIRATION STATUS INDICATOR
+                                    Uses model properties to determine status and appropriate messaging.
+                                    CSS classes provide color coding (expired/warning/fresh).
+                                    -->
+                                    <p class="expiry-status">
+                                        {% if food_item.is_expired %}
+                                            <span class="expired">Expired {{ food_item.days_until_expiration|add:"-1" }} days ago</span>
+                                        {% elif food_item.expires_soon %}
+                                            <span class="warning">Expires in {{ food_item.days_until_expiration }} days</span>
+                                        {% else %}
+                                            <span class="fresh">{{ food_item.days_until_expiration }} days remaining</span>
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            {% endif %}
+                            
+                            <!-- SPECIAL INDICATORS: Frozen status, etc. -->
+                            {% if food_item.is_frozen %}
+                                <p><span class="frozen-tag">Frozen</span></p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- INDIVIDUAL ITEM ACTIONS -->
+                        <div class="food-item-actions">
+                            <button class="btn btn-sm btn-outline">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeItem({{ food_item.pk }})">Remove</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <p>No food items found in this container.</p>
+            <!-- EMPTY STATE: Shown when container has no items -->
+            <div class="empty-state">
+                <p>No food items found in this container.</p>
+                <a href="{% url 'food-create' %}?container={{ container.pk }}" class="btn btn-primary">+ Add Your First Item</a>
+            </div>
         {% endif %}
     </div>
+    
+    <div class="back-section">
+        <a href="{% url 'my-lists' %}" class="btn btn-secondary">← Back to All Containers</a>
+    </div>
+</div>
+
+<script>
+/*
+INTERACTIVE CONTAINER MANAGEMENT JAVASCRIPT
+
+This script provides real-time interaction for managing food items within a container.
+It handles batch operations, quantity adjustments, and provides live user feedback.
+
+Key Features:
+1. Batch Selection: Select multiple items for bulk operations
+2. Quantity Management: Adjust quantities with immediate visual feedback
+3. Live Counters: Real-time updates of selections and pending changes
+4. Dynamic UI: Show/hide operation bars based on user actions
+
+Data Structures:
+- quantityChanges: Object tracking modified quantities {itemId: newQuantity}
+- selectedItems: Set of selected item IDs for batch operations
+*/
+
+// =============================================================================
+// GLOBAL STATE MANAGEMENT
+// =============================================================================
+
+// Track quantity changes for each item: {itemId: newQuantity}
+// This allows users to make multiple changes before saving
+let quantityChanges = {};
+
+// Track selected items for batch operations using Set for efficient lookups
+// Set automatically handles uniqueness and provides fast add/delete operations
+let selectedItems = new Set();
+
+// =============================================================================
+// BULK SELECTION FUNCTIONALITY
+// =============================================================================
+
+/**
+ * MASTER "SELECT ALL" CHECKBOX HANDLER
+ * 
+ * Toggles all individual item checkboxes and updates the selection state.
+ * This provides a convenient way to select/deselect all items at once.
+ */
+document.getElementById('select-all')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.item-select');
+    
+    // Update all individual checkboxes to match the master checkbox
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+        
+        // Update the selectedItems Set based on checkbox state
+        if (this.checked) {
+            selectedItems.add(checkbox.dataset.itemId);
+        } else {
+            selectedItems.delete(checkbox.dataset.itemId);
+        }
+    });
+    
+    // Update the UI to show/hide batch operations
+    updateBatchOperations();
+});
+
+/**
+ * INDIVIDUAL CHECKBOX HANDLERS
+ * 
+ * Handle individual item selection and maintain selection state.
+ * Updates the selectedItems Set and refreshes the batch operations UI.
+ */
+document.querySelectorAll('.item-select').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        // Update selection state based on checkbox
+        if (this.checked) {
+            selectedItems.add(this.dataset.itemId);
+        } else {
+            selectedItems.delete(this.dataset.itemId);
+        }
+        
+        // Update the UI to reflect current selection
+        updateBatchOperations();
+    });
+});
+
+// =============================================================================
+// DYNAMIC UI UPDATE FUNCTIONS
+// =============================================================================
+
+/**
+ * UPDATE BATCH OPERATIONS VISIBILITY AND COUNTER
+ * 
+ * Shows/hides the batch operations bar based on selection state.
+ * Updates the counter to show how many items are selected.
+ * Provides immediate visual feedback to users about their selections.
+ */
+function updateBatchOperations() {
+    const batchOps = document.getElementById('batch-operations');
+    const selectedCount = document.getElementById('selected-count');
+    
+    if (selectedItems.size > 0) {
+        // Show operations bar when items are selected
+        batchOps.style.display = 'flex';
+        selectedCount.textContent = selectedItems.size;
+    } else {
+        // Hide operations bar when no items are selected
+        batchOps.style.display = 'none';
+    }
+}
+
+/**
+ * UPDATE QUANTITY CHANGES VISIBILITY AND COUNTER
+ * 
+ * Shows/hides the quantity changes bar based on pending modifications.
+ * Updates the counter to show how many items have quantity changes.
+ * Provides feedback about unsaved changes to prevent data loss.
+ */
+function updateQuantityChanges() {
+    const quantityOps = document.getElementById('quantity-changes');
+    const changesCount = document.getElementById('changes-count');
+    const changeCount = Object.keys(quantityChanges).length;
+    
+    if (changeCount > 0) {
+        // Show changes bar when there are pending modifications
+        quantityOps.style.display = 'flex';
+        changesCount.textContent = changeCount;
+    } else {
+        // Hide changes bar when no modifications are pending
+        quantityOps.style.display = 'none';
+    }
+}
+
+// =============================================================================
+// QUANTITY MANAGEMENT FUNCTIONS
+// =============================================================================
+
+/**
+ * ADJUST ITEM QUANTITY WITH +/- BUTTONS
+ * 
+ * Modifies the quantity of a specific item and tracks the change.
+ * Provides immediate visual feedback and prevents negative quantities.
+ * 
+ * @param {number} itemId - The ID of the food item to modify
+ * @param {number} change - The amount to change (+1 for increase, -1 for decrease)
+ */
+function adjustQuantity(itemId, change) {
+    const qtyDisplay = document.getElementById(`qty-${itemId}`);
+    const originalQty = parseInt(qtyDisplay.dataset.original);
+    const currentQty = parseInt(qtyDisplay.textContent);
+    
+    // Calculate new quantity, ensuring it doesn't go below 0
+    const newQty = Math.max(0, currentQty + change);
+    
+    // Update the visual display immediately
+    qtyDisplay.textContent = newQty;
+    
+    // Track changes for batch saving
+    if (newQty !== originalQty) {
+        // Store the change if different from original
+        quantityChanges[itemId] = newQty;
+    } else {
+        // Remove from changes if back to original value
+        delete quantityChanges[itemId];
+    }
+    
+    // Update the UI to show/hide the changes bar
+    updateQuantityChanges();
+}
+
+// =============================================================================
+// USER ACTION FUNCTIONS
+// =============================================================================
+
+/**
+ * CLEAR ALL SELECTIONS
+ * 
+ * Resets all checkboxes and clears the selection state.
+ * Provides a quick way to deselect all items.
+ */
+function clearSelection() {
+    selectedItems.clear();
+    
+    // Uncheck all checkboxes
+    document.querySelectorAll('.item-select').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    document.getElementById('select-all').checked = false;
+    
+    // Update UI to hide batch operations
+    updateBatchOperations();
+}
+
+/**
+ * RESET ALL QUANTITY CHANGES
+ * 
+ * Reverts all quantity displays to their original values.
+ * Clears the pending changes without saving to database.
+ */
+function resetQuantities() {
+    // Revert each changed quantity to its original value
+    Object.keys(quantityChanges).forEach(itemId => {
+        const qtyDisplay = document.getElementById(`qty-${itemId}`);
+        qtyDisplay.textContent = qtyDisplay.dataset.original;
+    });
+    
+    // Clear the changes tracking
+    quantityChanges = {};
+    
+    // Update UI to hide changes bar
+    updateQuantityChanges();
+}
+
+// =============================================================================
+// BATCH OPERATION FUNCTIONS
+// =============================================================================
+
+/**
+ * BATCH MOVE SELECTED ITEMS TO ANOTHER CONTAINER
+ * 
+ * Moves all selected items to the chosen destination container.
+ * Includes validation and user feedback.
+ */
+function batchMoveItems() {
+    const targetContainer = document.getElementById('move-to-container').value;
+    
+    // Validate that a destination container is selected
+    if (!targetContainer) {
+        alert('Please select a container to move items to.');
+        return;
+    }
+    
+    const itemIds = Array.from(selectedItems);
+    console.log('Moving items:', itemIds, 'to container:', targetContainer);
+    
+    // TODO: Replace with actual AJAX call to backend
+    // Example AJAX implementation:
+    /*
+    fetch('/api/batch-move-items/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({
+            item_ids: itemIds,
+            target_container: targetContainer
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to show changes
+        } else {
+            alert('Error moving items: ' + data.error);
+        }
+    });
+    */
+    
+    // Placeholder alert for demonstration
+    alert(`Moving ${itemIds.length} items to container ${targetContainer}`);
+}
+
+/**
+ * BATCH REMOVE SELECTED ITEMS
+ * 
+ * Removes all selected items from the container with confirmation.
+ * Includes safety confirmation to prevent accidental deletions.
+ */
+function batchRemoveItems() {
+    // Safety confirmation for destructive action
+    if (!confirm(`Are you sure you want to remove ${selectedItems.size} items?`)) {
+        return;
+    }
+    
+    const itemIds = Array.from(selectedItems);
+    console.log('Removing items:', itemIds);
+    
+    // TODO: Replace with actual AJAX call to backend
+    // Similar to batch move, but for deletion
+    
+    // Placeholder alert for demonstration
+    alert(`Removing ${itemIds.length} items`);
+}
+
+/**
+ * SAVE ALL QUANTITY CHANGES TO DATABASE
+ * 
+ * Commits all pending quantity modifications to the backend.
+ * Provides feedback on the number of changes being saved.
+ */
+function saveQuantityChanges() {
+    console.log('Saving quantity changes:', quantityChanges);
+    
+    // TODO: Replace with actual AJAX call to backend
+    /*
+    fetch('/api/update-quantities/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({
+            quantity_changes: quantityChanges
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update original values and clear changes
+            Object.keys(quantityChanges).forEach(itemId => {
+                const qtyDisplay = document.getElementById(`qty-${itemId}`);
+                qtyDisplay.dataset.original = quantityChanges[itemId];
+            });
+            quantityChanges = {};
+            updateQuantityChanges();
+        } else {
+            alert('Error saving changes: ' + data.error);
+        }
+    });
+    */
+    
+    // Placeholder alert for demonstration
+    alert(`Saving ${Object.keys(quantityChanges).length} quantity changes`);
+}
+
+/**
+ * REMOVE SINGLE ITEM WITH CONFIRMATION
+ * 
+ * Removes an individual item from the container.
+ * Includes confirmation dialog for safety.
+ * 
+ * @param {number} itemId - The ID of the item to remove
+ */
+function removeItem(itemId) {
+    // Safety confirmation for destructive action
+    if (!confirm('Are you sure you want to remove this item?')) {
+        return;
+    }
+    
+    console.log('Removing item:', itemId);
+    
+    // TODO: Replace with actual AJAX call to backend
+    // Placeholder alert for demonstration
+    alert(`Removing item ${itemId}`);
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS (for future AJAX implementation)
+// =============================================================================
+
+/**
+ * GET CSRF TOKEN FOR DJANGO AJAX REQUESTS
+ * 
+ * Utility function to extract CSRF token from cookies for secure AJAX calls.
+ * Required for POST requests to Django backend.
+ */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+{% endblock %}

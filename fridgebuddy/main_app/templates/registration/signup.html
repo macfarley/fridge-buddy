@@ -9,6 +9,14 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
+            <div class="form-group">
+                <label for="id_birthday">Birthday:</label>
+                <input type="date" name="birthday" id="id_birthday" class="form-control">
+            </div>
+            {% comment %} <div class="form-group">
+                <label for="id_profile_image">Profile Image:</label>
+                <input type="file" name="profile_image" id="id_profile_image" class="form-control">
+            </div> {% endcomment %}
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
         <p>Already have an account? <a href="{% url 'login' %}">Log in here</a>.</p>

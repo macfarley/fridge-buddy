@@ -1,29 +1,65 @@
-{% comment %} This is a class-based view for creating user-owned containers like Fridge, Freezer, Pantry, Shopping List {% endcomment %}
-<form method="post" class="container-form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div class="form-row">
-        <div class="form-group">
-            <label for="{{ form.name.id_for_label }}">Container Name *</label>
-            {{ form.name }}
-            {% if form.name.errors %}
-                <div class="form-errors">
-                    {% for error in form.name.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if container %}Edit {{ container.name }}{% else %}Add New Container{% endif %} - Fridge Buddy
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <a href="{% url 'my-lists' %}" class="back-link">← Back to My Lists</a>
+            <h1>
+                {% if container %}
+                    Edit {{ container.name }}
+                {% else %}
+                    Add New Container
+                {% endif %}
+            </h1>
         </div>
-        <div class="form-group">
-            <label for="{{ form.container_type.id_for_label }}">Container Type *</label>
-            {{ form.container_type }}
-            {% if form.container_type.errors %}
-                <div class="form-errors">
-                    {% for error in form.container_type.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
+
+        <div class="form-card">
+            <form method="post" class="container-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Container Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="form-errors">
+                                {% for error in form.name.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.container_type.id_for_label }}">Container Type *</label>
+                        {{ form.container_type }}
+                        {% if form.container_type.errors %}
+                            <div class="form-errors">
+                                {% for error in form.container_type.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        {% if container %}Update Container{% else %}Add Container{% endif %}
+                    </button>
+                    <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>
+{% endblock %}
