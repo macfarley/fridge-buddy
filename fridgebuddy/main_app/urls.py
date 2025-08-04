@@ -42,5 +42,17 @@ urlpatterns = [
     # Delete a food item from the catalog (not from a container) *Danger*
     path('food-catalog/<int:pk>/delete/', views.FoodDelete.as_view(), name='food-delete'),
 
+    # Shopping list route
+    path('shopping-list/', views.ShoppingListView.as_view(), name='shopping-list'),
+
+    # AJAX endpoints for food catalog actions
+    path('api/add-to-container/', views.add_food_to_container, name='add-food-to-container'),
+    path('api/batch-add-to-shopping/', views.batch_add_to_shopping_list, name='batch-add-to-shopping'),
+    path('api/batch-add-to-shopping-list/', views.batch_add_to_shopping_list, name='batch-add-to-shopping-list'),
+    path('api/move-to-container/', views.move_shopping_item_to_container, name='move-to-container'),
+    path('api/batch-move-shopping-items/', views.batch_move_shopping_items, name='batch-move-shopping-items'),
+    path('api/update-food-item/', views.update_food_item, name='update-food-item'),
+    path('api/delete-food-item/', views.delete_food_item, name='delete-food-item'),
+
 
 ]

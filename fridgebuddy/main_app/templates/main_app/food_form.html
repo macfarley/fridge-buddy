@@ -1,113 +1,64 @@
 {% extends 'base.html' %}
 {% load static %}
-{% comment %} This template handles the creation and editing of food items in the fridge. {% endcomment %}
+{% comment %} This template handles the creation and editing of food items in the global food catalog. {% endcomment %}
 {% block title %}
     {% comment %} Dynamically set the page title based on whether the user is adding or editing a food item {% endcomment %}
-    {% if food %}Edit {{ food.name }}{% else %}Add New Food Item{% endif %} - Fridge Buddy
+    {% if object %}Edit {{ object.name }}{% else %}Add New Food to Catalog{% endif %} - Fridge Buddy
 {% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+<link rel="stylesheet" href="{% static 'css/food_form.css' %}" />
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="form-container">
+    <div class="page-header-section">
         <div class="form-header">
-            <a href="{% url 'my-lists' %}" class="back-link">← Back to Fridge</a>
+            <a href="{% url 'food-catalog' %}" class="back-link">← Back to Food Catalog</a>
             <h1>
                 {% comment %} Display appropriate heading based on whether the user is adding or editing a food item {% endcomment %}
-                {% if food %}
-                    Edit {{ food.name }}
+                {% if object %}
+                    Edit {{ object.name }}
                 {% else %}
-                    Add New Food Item
+                    Add New Food to Catalog
                 {% endif %}
             </h1>
         </div>
+    </div>
 
-        <div class="form-card">
-            <form method="POST" class="food-form">
-                {% csrf_token %} <!-- Security token for form submission -->
+    <div class="form-section">
+        <div class="form-container">
+            <div class="form-card">
+                <form method="POST" class="food-form">
+                    {% csrf_token %} <!-- Security token for form submission -->
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.name.id_for_label }}">Food Name *</label>
-                        {{ form.name }} <!-- Input field for food name -->
-                        {% if form.name.errors %}
-                            <div class="form-errors">
-                                {% for error in form.name.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">Food Name *</label>
+                            {{ form.name }} <!-- Input field for food name -->
+                            {% if form.name.errors %}
+                                <div class="form-errors">
+                                    {% for error in form.name.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.category.id_for_label }}">Category</label>
+                            {{ form.category }} <!-- Dropdown for selecting food category -->
+                            {% if form.category.errors %}
+                                <div class="form-errors">
+                                    {% for error in form.category.errors %}
+                                        <span class="error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="{{ form.category.id_for_label }}">Category</label>
-                        {{ form.category }} <!-- Dropdown for selecting food category -->
-                        {% if form.category.errors %}
-                            <div class="form-errors">
-                                {% for error in form.category.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.expiration_date.id_for_label }}">Expiration Date *</label>
-                        {{ form.expiration_date }} <!-- Input field for expiration date -->
-                        {% if form.expiration_date.errors %}
-                            <div class="form-errors">
-                                {% for error in form.expiration_date.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.quantity.id_for_label }}">Quantity</label>
-                        {{ form.quantity }} <!-- Input field for quantity -->
-                        {% if form.quantity.errors %}
-                            <div class="form-errors">
-                                {% for error in form.quantity.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.purchase_date.id_for_label }}">Purchase Date</label>
-                        {{ form.purchase_date }}
-                        {% if form.purchase_date.errors %}
-                            <div class="form-errors">
-                                {% for error in form.purchase_date.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.location.id_for_label }}">Location in Fridge</label>
-                        {{ form.location }}
-                        {% if form.location.errors %}
-                            <div class="form-errors">
-                                {% for error in form.location.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.description.id_for_label }}">Description</label>
                         {{ form.description }}
@@ -120,61 +71,27 @@
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        <label for="{{ form.image_url.id_for_label }}">Image URL</label>
+                    {% comment %} Hide image_url field for now {% endcomment %}
+                    <div class="hidden-field">
                         {{ form.image_url }}
-                        {% if form.image_url.errors %}
-                            <div class="form-errors">
-                                {% for error in form.image_url.errors %}
-                                    <span class="error">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                     </div>
-                </div>
 
-                <div class="form-group full-width">
-                    <label for="{{ form.notes.id_for_label }}">Notes</label>
-                    {{ form.notes }}
-                    {% if form.notes.errors %}
-                        <div class="form-errors">
-                            {% for error in form.notes.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
+                    {% comment %} Option to add to shopping list {% endcomment %}
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="add-to-shopping-list" name="add_to_shopping_list">
+                        <label for="add-to-shopping-list">🛒 Also add this item to my shopping list</label>
+                    </div>
 
-                <div class="form-group">
-                    <input type="checkbox" id="add-to-list" name="add_to_list">
-                    <label for="add-to-list">Add this item to one of your lists?</label>
-                    <select id="list-select" name="list_id" disabled>
-                        <option value="">Select a list</option>
-                        {% comment %} Populate dropdown with user's available containers {% endcomment %}
-                        {% for container in user.container_set.all %}
-                            <option value="{{ container.pk }}">{{ container.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <script>
-                    // Enable or disable the dropdown based on the checkbox state
-                    document.getElementById('add-to-list').addEventListener('change', function() {
-                        const listSelect = document.getElementById('list-select');
-                        listSelect.disabled = !this.checked;
-                    });
-                </script>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        {% comment %} Set button text based on whether the user is adding or editing {% endcomment %}
-                        {% if food %}Update Food Item{% else %}Add Food Item{% endif %}
-                    </button>
-                    <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            {% comment %} Set button text based on whether the user is adding or editing {% endcomment %}
+                            {% if object %}Update Food Item{% else %}Add Food Item{% endif %}
+                        </button>
+                        <a href="{% url 'food-catalog' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

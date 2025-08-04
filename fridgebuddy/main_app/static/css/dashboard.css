@@ -1,0 +1,202 @@
+/*
+DASHBOARD SPECIFIC STYLES
+
+Styling for the user dashboard page including profile management and container overview.
+*/
+
+/* =============================================================================
+   DASHBOARD LAYOUT
+   ============================================================================= */
+
+.dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.dashboard h1 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.dashboard p {
+    margin: 0.5rem 0;
+    color: var(--text-color);
+}
+
+/* =============================================================================
+   PROFILE SECTION
+   ============================================================================= */
+
+.profile-info {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.birthday-message {
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 600;
+    margin: 1rem 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* =============================================================================
+   CONTAINERS SECTION
+   ============================================================================= */
+
+.containers-section {
+    margin-bottom: 2rem;
+}
+
+.containers-section h2 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.container-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.container-list li {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.container-list li:hover {
+    background: var(--hover-color);
+    transform: translateX(5px);
+}
+
+.container-list a {
+    display: block;
+    padding: 1rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.container-list a:hover {
+    color: var(--primary-color);
+}
+
+.empty-containers {
+    text-align: center;
+    padding: 2rem;
+    background: var(--surface-color);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-muted);
+}
+
+.empty-containers a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.empty-containers a:hover {
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   PROFILE UPDATE PANEL
+   ============================================================================= */
+
+.hidden-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-top: 1rem;
+}
+
+.hidden-panel.show {
+    max-height: 1000px;
+    opacity: 1;
+    padding: 2rem;
+}
+
+.hidden-panel h2 {
+    margin: 0 0 1.5rem 0;
+    color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(82, 197, 160, 0.2);
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.edit-profile-btn {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+    
+    .hidden-panel.show {
+        padding: 1rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .container-list li:hover {
+        transform: none;
+    }
+}

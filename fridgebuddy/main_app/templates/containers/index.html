@@ -9,67 +9,88 @@
 
 {% block content %}
 <div class="container">
-    <div class="header-section">
-        <h1>My Containers</h1>
-    </div>
-
-    <!-- Quick Add Container Form -->
-    <div class="quick-add-section">
-        <h2>Add New Container</h2>
-        <form method="post" class="inline-container-form">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Name</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="form-errors">
-                            {% for error in form.name.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.container_type.id_for_label }}">Type</label>
-                    {{ form.container_type }}
-                    {% if form.container_type.errors %}
-                        <div class="form-errors">
-                            {% for error in form.container_type.errors %}
-                                <span class="error">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Add Container</button>
-                </div>
-            </div>
-        </form>
+    <div class="page-header-section">
+        <div class="header-section">
+            <h1>My Containers</h1>
+        </div>
     </div>
 
     {% if container_list %}
-        <div class="container-grid">
-            {% for container in container_list %}
-                <div class="container-card">
-                    <div class="container-header">
-                        <h3>{{ container.name }}</h3>
-                        <span class="container-type">{{ container.get_container_type_display }}</span>
+        <div class="containers-section">
+            <div class="container-grid">
+                {% for container in container_list %}
+                    <div class="container-card">
+                        <div class="container-header">
+                            <h3>{{ container.name }}</h3>
+                            <span class="container-type">{{ container.get_container_type_display }}</span>
+                        </div>
+                        <div class="container-stats">
+                            <span class="item-count">{{ container.item_count|default:0 }} item{{ container.item_count|default:0|pluralize }}</span>
+                            {% if container.total_quantity %}
+                                <span class="total-quantity">Total: {{ container.total_quantity }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="container-actions">
+                            <a href="{% url 'food-index' container.pk %}" class="btn btn-secondary">
+                                View Items
+                                {% if container.total_quantity %}
+                                    ({{ container.total_quantity }})
+                                {% else %}
+                                    (0)
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'container-update' container.pk %}" class="btn btn-outline">Edit</a>
+                            <a href="{% url 'container-delete' container.pk %}" class="btn btn-danger">Delete</a>
+                        </div>
                     </div>
-                    <div class="container-actions">
-                        <a href="{% url 'food-index' container.pk %}" class="btn btn-secondary">View Items</a>
-                        <a href="{% url 'container-update' container.pk %}" class="btn btn-outline">Edit</a>
-                        <a href="{% url 'container-delete' container.pk %}" class="btn btn-danger">Delete</a>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     {% else %}
-        <div class="empty-state">
-            <h3>No containers yet!</h3>
-            <p>Use the form above to create your first container and start organizing your food items.</p>
+        <div class="empty-state-section">
+            <div class="empty-state">
+                <h3>No containers yet!</h3>
+                <p>Use the form below to create your first container and start organizing your food items.</p>
+            </div>
         </div>
     {% endif %}
+
+    <!-- Quick Add Container Form - Moved to bottom -->
+    <div class="add-form-section">
+        <div class="quick-add-section">
+            <h2>Add New Container</h2>
+            <form method="post" class="inline-container-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="form-errors">
+                                {% for error in form.name.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.container_type.id_for_label }}">Type</label>
+                        {{ form.container_type }}
+                        {% if form.container_type.errors %}
+                            <div class="form-errors">
+                                {% for error in form.container_type.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Add Container</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

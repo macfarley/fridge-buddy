@@ -19,9 +19,9 @@ class ContainerAdmin(admin.ModelAdmin):
 
 @admin.register(ContainerFood)
 class ContainerFoodAdmin(admin.ModelAdmin):
-    list_display = ['food', 'container', 'quantity', 'expiration_date', 'date_added']
-    list_filter = ['expiration_date', 'date_added', 'container__container_type']
-    search_fields = ['food__name', 'container__name']
+    list_display = ['catalog_food', 'container', 'quantity', 'expiration_date', 'added_at']
+    list_filter = ['expiration_date', 'added_at', 'container__container_type']
+    search_fields = ['catalog_food__name', 'container__name']
 
 @admin.register(CatalogFood)
 class CatalogFoodAdmin(admin.ModelAdmin):
@@ -35,77 +35,77 @@ class CatalogFoodAdmin(admin.ModelAdmin):
         sample_foods = [
             {
                 "name": "Chicken Breast",
-                "category": "MEAT",
+                "category": "meat",
                 "description": "Boneless, skinless chicken breast"
             },
             {
                 "name": "Whole Milk",
-                "category": "DAIRY",
+                "category": "dairy",
                 "description": "Fresh whole milk, 3.25% fat"
             },
             {
                 "name": "Bananas",
-                "category": "FRUIT",
+                "category": "fruits",
                 "description": "Fresh yellow bananas"
             },
             {
                 "name": "Spinach",
-                "category": "VEGETABLE",
+                "category": "vegetables",
                 "description": "Fresh baby spinach leaves"
             },
             {
                 "name": "White Bread",
-                "category": "GRAIN",
+                "category": "grains",
                 "description": "Sliced white bread loaf"
             },
             {
                 "name": "Cheddar Cheese",
-                "category": "DAIRY",
+                "category": "dairy",
                 "description": "Sharp cheddar cheese block"
             },
             {
                 "name": "Ground Beef",
-                "category": "MEAT",
+                "category": "meat",
                 "description": "80/20 ground beef"
             },
             {
                 "name": "Apples",
-                "category": "FRUIT",
+                "category": "fruits",
                 "description": "Fresh red apples"
             },
             {
                 "name": "Carrots",
-                "category": "VEGETABLE", 
+                "category": "vegetables", 
                 "description": "Fresh baby carrots"
             },
             {
                 "name": "Brown Rice",
-                "category": "GRAIN",
+                "category": "grains",
                 "description": "Long grain brown rice"
             },
             {
                 "name": "Salmon",
-                "category": "SEAFOOD",
+                "category": "seafood",
                 "description": "Fresh Atlantic salmon fillet"
             },
             {
                 "name": "Eggs",
-                "category": "DAIRY",
+                "category": "dairy",
                 "description": "Large grade A eggs"
             },
             {
                 "name": "Olive Oil",
-                "category": "OTHER",
+                "category": "condiments",
                 "description": "Extra virgin olive oil"
             },
             {
                 "name": "Black Pepper",
-                "category": "SPICE",
+                "category": "other",
                 "description": "Ground black pepper"
             },
             {
                 "name": "Orange Juice",
-                "category": "BEVERAGE",
+                "category": "beverages",
                 "description": "Fresh squeezed orange juice"
             }
         ]

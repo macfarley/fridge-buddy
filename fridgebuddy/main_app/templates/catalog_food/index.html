@@ -1,96 +1,130 @@
 {% extends 'base.html' %}
 {% block title %}All Foods - Fridge Buddy{% endblock %}
-{% comment %} Catalog Food Index Template {% endcomment %}
 {% load static %}
 
 {% block head %}
   <link rel="icon" type="image/x-icon" href="{% static 'images/fridgebuddy.ico' %}" />
+  <link rel="stylesheet" href="{% static 'css/food_catalog.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/food_catalog_enhanced.css' %}" />
 {% endblock %}
+
 {% block content %}
-  <h1>All Foods</h1>
-  <div class="food-catalog">
-    {% if foods %}
-      {% regroup foods by category as category_list %} <!-- Group foods by their category -->
-      <ul class="category-list">
-        {% for category in category_list %}
-          <li class="category-item">
-            <!-- Category header that toggles visibility of the food list -->
-            <h2 class="category-header" onclick="toggleCategory('{{ category.grouper }}')">
-              {{ category.grouper }}
-            </h2>
-            <ul id="category-{{ category.grouper }}" class="food-list" style="display: none;">
-              {% for food in category.list %}
-                <li class="food-item">
-                  <!-- Checkbox for selecting food items for batch actions -->
-                  <input type="checkbox" class="food-checkbox" data-food-id="{{ food.pk }}">
-                  <h3>{{ food.name }}</h3>
-                  <p>Expiration Date: {{ food.expiration_date }}</p>
-                  <p>Quantity: {{ food.quantity }}</p>
-                  <p>Container: 
-                    {% if food.container %}
-                      <!-- Link to the container details if the food is in a container -->
-                      <a href="{% url 'container-detail' food.container.pk %}">{{ food.container.name }}</a>
-                    {% else %}
-                      None
-                    {% endif %}
-                  </p>
-                  {% if user.is_authenticated %}
-                    <!-- Dropdown for selecting a container to add the food to -->
-                    <select class="container-select" data-food-id="{{ food.pk }}">
-                      <option value="">Select Container</option>
-                      {% for container in user.container_set.all %}
-                        <option value="{{ container.pk }}">{{ container.name }}</option>
-                      {% endfor %}
-                    </select>
-                    <!-- Button to add the food to the selected container -->
-                    <button class="add-to-container-btn" data-food-id="{{ food.pk }}">Add</button>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% endfor %}
-      </ul>
-      {% if user.is_authenticated %}
-        <!-- Button to add all selected foods to the shopping list -->
-        <button id="batch-add-btn">Add Selected to Shopping List</button>
+  {% csrf_token %}
+  <h1>Food Catalog</h1>
+  
+  <!-- Display Messages -->
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  {% endif %}
+  
+  <div class="catalog-layout">
+    <div class="food-catalog">
+      {% if foods %}
+        {% regroup foods by category as category_list %}
+        <ul class="category-list">
+          {% for category in category_list %}
+            <li class="category-item">
+              <h2 class="category-header" data-category="{{ category.grouper }}" data-expanded="false">
+                <span class="category-arrow">▶</span>
+                <span>{{ category.grouper|title }} ({{ category.list|length }})</span>
+              </h2>
+              <ul id="category-{{ category.grouper }}" class="food-list" style="display: none;">
+                {% for food in category.list %}
+                  <li class="food-item">
+                    <input type="checkbox" class="food-checkbox" data-food-id="{{ food.pk }}" data-food-name="{{ food.name }}" data-food-category="{{ food.category }}">
+                    
+                    <div class="food-item-content">
+                      <div class="food-item-info">
+                        <h3>{{ food.name }}</h3>
+                        {% if food.description %}
+                          <p class="food-item-description">{{ food.description }}</p>
+                        {% endif %}
+                      </div>
+                      
+                      {% if user.is_authenticated %}
+                        <div class="food-item-actions">
+                          <select class="container-select" data-food-id="{{ food.pk }}">
+                            <option value="">Select List</option>
+                            {% for container in user.containers.all %}
+                              <option value="{{ container.pk }}">
+                                {% if container.container_type == 'SHOPPING' %}
+                                  🛒 {{ container.name }}
+                                {% elif container.container_type == 'FRIDGE' %}
+                                  🧊 {{ container.name }}
+                                {% elif container.container_type == 'PANTRY' %}
+                                  🥫 {{ container.name }}
+                                {% elif container.container_type == 'FREEZER' %}
+                                  ❄️ {{ container.name }}
+                                {% else %}
+                                  📦 {{ container.name }}
+                                {% endif %}
+                              </option>
+                            {% endfor %}
+                          </select>
+                          <button class="add-to-container-btn" data-food-id="{{ food.pk }}">Add to List</button>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+        
+        {% if user.is_authenticated %}
+          <div class="batch-actions">
+            <button id="batch-add-btn" class="btn btn-primary">🛒 Add Selected to Shopping List</button>
+            <span id="selected-count">0 items selected</span>
+          </div>
+        {% endif %}
+      {% else %}
+        <p>No foods available in the catalog yet.</p>
       {% endif %}
-    {% else %}
-      <p>No foods available in the catalog yet.</p>
+
+      <div class="add-food-section">
+        <h2>Don't see something you like? Add it here:</h2>
+        <a href="{% url 'food-create' %}" class="btn btn-primary">Add New Food</a>
+      </div>
+    </div>
+
+    <!-- Shopping List Sidebar -->
+    {% if user.is_authenticated %}
+      <div class="shopping-sidebar">
+        <h2>
+          <a href="{% url 'shopping-list' %}">
+            🛒 My Shopping List
+          </a>
+        </h2>
+        <div id="shopping-list-content">
+          {% if shopping_items %}
+            {% for item in shopping_items %}
+              <div class="shopping-item" data-item-id="{{ item.pk }}">
+                <div class="shopping-item-info">
+                  <div class="shopping-item-name">{{ item.catalog_food.name }}</div>
+                  <div class="shopping-item-category">{{ item.catalog_food.category }}</div>
+                </div>
+                <div class="shopping-item-quantity">{{ item.quantity }}</div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="shopping-list-empty" id="empty-message">
+              Your shopping list is empty. Select items from the catalog to add them!
+            </div>
+          {% endif %}
+        </div>
+      </div>
     {% endif %}
   </div>
 
-  <div class="add-food-section">
-    <!-- Section for adding a new food item -->
-    <h2>Don't see something you like? Add it here:</h2>
-    <a href="{% url 'food-create' %}" class="btn btn-primary">Add New Food</a>
-  </div>
-
+  <script src="{% static 'js/food_catalog.js' %}"></script>
   <script>
-    // Function to toggle the visibility of a category's food list
-    function toggleCategory(category) {
-      const list = document.getElementById(`category-${category}`);
-      list.style.display = list.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // Event listener for the batch add button
-    document.getElementById('batch-add-btn')?.addEventListener('click', () => {
-      // Collect all selected food items by their IDs
-      const selectedFoods = Array.from(document.querySelectorAll('.food-checkbox:checked'))
-        .map(checkbox => checkbox.dataset.foodId);
-      // Log the selected food IDs (replace with server call for actual implementation)
-      console.log('Batch Add:', selectedFoods);
-    });
-
-    // Add event listeners for each "Add to Container" button
-    document.querySelectorAll('.add-to-container-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        // Get the food ID and selected container ID
-        const foodId = button.dataset.foodId;
-        const containerId = document.querySelector(`.container-select[data-food-id="${foodId}"]`).value;
-        // Log the food and container IDs (replace with server call for actual implementation)
-        console.log('Add to Container:', { foodId, containerId });
-      });
-    });
+    // Template-specific configuration
+    const batchAddToShoppingUrl = '{% url "batch-add-to-shopping" %}';
+    const addFoodToContainerUrl = '{% url "add-food-to-container" %}';
   </script>
 {% endblock %}

@@ -3,7 +3,7 @@
 # Import render to render templates
 from django.shortcuts import render, redirect
 # Import HttpResponse to send text-based responses
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Django class-based views and mixins
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -137,7 +137,12 @@ class ContainerIndexView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Security: Only show containers owned by the current user
-        return Container.objects.filter(owner=self.request.user)
+        # Annotate with total quantity of items in each container
+        from django.db.models import Sum, Count
+        return Container.objects.filter(owner=self.request.user).annotate(
+            total_quantity=Sum('items__quantity'),
+            item_count=Count('items')
+        )
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -270,13 +275,41 @@ class ContainerDelete(LoginRequiredMixin, DeleteView):
         return '/my-lists/'
 
 # Food CRUD views
-class FoodCreate(CreateView):
+class FoodCreate(LoginRequiredMixin, CreateView):
     model = CatalogFood
     fields = ['name', 'category', 'description', 'image_url']
     template_name = 'main_app/food_form.html'
     
+    def form_valid(self, form):
+        # Set the contributor to the current user
+        form.instance.contributor = self.request.user
+        
+        # Save the catalog food item
+        response = super().form_valid(form)
+        
+        # Check if user wants to add to shopping list
+        if self.request.POST.get('add_to_shopping_list'):
+            # Get or create a shopping list for the user
+            shopping_list, created = Container.objects.get_or_create(
+                owner=self.request.user,
+                container_type='SHOPPING',
+                defaults={'name': 'Shopping List'}
+            )
+            
+            # Add the food item to the shopping list
+            ContainerFood.objects.get_or_create(
+                container=shopping_list,
+                catalog_food=self.object,
+                defaults={
+                    'quantity': 1,
+                    'checked_off': False
+                }
+            )
+        
+        return response
+    
     def get_success_url(self):
-        return f'/food/{self.object.pk}/'
+        return f'/food-catalog/{self.object.pk}/'
 
 class FoodUpdate(UpdateView):
     model = CatalogFood
@@ -301,9 +334,612 @@ class FoodDelete(DeleteView):
 class FoodCatalogListView(ListView):
     model = CatalogFood
     template_name = 'catalog_food/index.html'
-    context_object_name = 'food_list'
+    context_object_name = 'foods'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            # Get or create user's shopping list (container with type 'SHOPPING')
+            shopping_list, created = Container.objects.get_or_create(
+                owner=self.request.user,
+                container_type='SHOPPING',
+                defaults={
+                    'name': 'Shopping List',
+                    'description': 'Your personal shopping list'
+                }
+            )
+            context['shopping_list'] = shopping_list
+            context['shopping_items'] = shopping_list.items.all()
+        return context
 
 class FoodDetailView(DetailView):
     model = CatalogFood
     template_name = 'catalog_food/details.html'
     context_object_name = 'food'
+
+class ShoppingListView(LoginRequiredMixin, DetailView):
+    """
+    Display the user's shopping list as a dedicated page with batch operations.
+    Enhanced to handle form submissions and reduce JavaScript dependency.
+    """
+    model = Container
+    template_name = 'shopping_list/index.html'
+    context_object_name = 'shopping_list'
+    
+    def get_object(self):
+        # Get or create user's shopping list
+        shopping_list, created = Container.objects.get_or_create(
+            owner=self.request.user,
+            container_type='SHOPPING',
+            defaults={
+                'name': 'Shopping List',
+                'description': 'Your personal shopping list'
+            }
+        )
+        return shopping_list
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add user's containers for the dropdown (excluding shopping list)
+        context['user_containers'] = Container.objects.filter(
+            owner=self.request.user
+        ).exclude(container_type='SHOPPING').order_by('name')
+        
+        # Add forms for server-side processing
+        from .forms import BatchMoveShoppingItemsForm, ContainerSelectionForm
+        
+        context['batch_move_form'] = BatchMoveShoppingItemsForm(user=self.request.user)
+        context['container_selection_form'] = ContainerSelectionForm(user=self.request.user)
+        
+        # Handle container selection if submitted
+        if self.request.GET.get('selected_container'):
+            try:
+                selected_container_id = int(self.request.GET.get('selected_container'))
+                selected_container = Container.objects.get(
+                    pk=selected_container_id,
+                    owner=self.request.user
+                )
+                context['selected_container'] = selected_container
+                context['selected_container_items'] = selected_container.items.all().order_by('expiration_date')
+            except (ValueError, Container.DoesNotExist):
+                pass
+        
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Handle form submissions for batch operations
+        """
+        from .forms import BatchMoveShoppingItemsForm, ClearCheckedItemsForm
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        
+        # Handle batch move operation
+        if 'batch_move' in request.POST:
+            form = BatchMoveShoppingItemsForm(user=request.user, data=request.POST)
+            if form.is_valid():
+                return self._handle_batch_move(form, request)
+            else:
+                for error in form.errors.values():
+                    messages.error(request, error)
+        
+        # Handle clear checked items operation
+        elif 'clear_checked' in request.POST:
+            form = ClearCheckedItemsForm(data=request.POST)
+            if form.is_valid():
+                return self._handle_clear_checked(form, request)
+            else:
+                for error in form.errors.values():
+                    messages.error(request, error)
+        
+        return redirect('shopping-list')
+    
+    def _handle_batch_move(self, form, request):
+        """
+        Process batch move operation server-side
+        """
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        
+        item_ids = form.cleaned_data['selected_items']
+        target_container = form.cleaned_data['target_container']
+        
+        # Get shopping items to move
+        shopping_items = ContainerFood.objects.filter(
+            pk__in=item_ids,
+            container__owner=request.user,
+            container__container_type='SHOPPING'
+        )
+        
+        moved_count = 0
+        for shopping_item in shopping_items:
+            # Check if item already exists in target container
+            existing_item, created = ContainerFood.objects.get_or_create(
+                container=target_container,
+                catalog_food=shopping_item.catalog_food,
+                defaults={
+                    'quantity': shopping_item.quantity,
+                    'is_frozen': target_container.container_type == 'FREEZER'
+                }
+            )
+            
+            if not created:
+                # Item already exists, increase quantity
+                existing_item.quantity += shopping_item.quantity
+                existing_item.save()
+            else:
+                # New item, let model calculate default expiration
+                existing_item.is_frozen = target_container.container_type == 'FREEZER'
+                existing_item.save()
+            
+            # Remove from shopping list
+            shopping_item.delete()
+            moved_count += 1
+        
+        messages.success(
+            request, 
+            f'Successfully moved {moved_count} items to {target_container.name}'
+        )
+        return redirect('shopping-list')
+    
+    def _handle_clear_checked(self, form, request):
+        """
+        Process clear checked items operation server-side
+        """
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        
+        item_ids = form.cleaned_data['checked_items']
+        
+        # Remove checked items from shopping list
+        removed_items = ContainerFood.objects.filter(
+            pk__in=item_ids,
+            container__owner=request.user,
+            container__container_type='SHOPPING'
+        )
+        
+        removed_count = removed_items.count()
+        removed_items.delete()
+        
+        messages.success(request, f'Removed {removed_count} items from shopping list')
+        return redirect('shopping-list')
+
+# AJAX endpoint for adding food to containers
+@login_required
+def add_food_to_container(request):
+    """
+    AJAX endpoint to add a catalog food item to a user's container
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            food_id = data.get('food_id')
+            container_id = data.get('container_id')
+            quantity = data.get('quantity', 1)
+            
+            # Validate inputs
+            if not food_id or not container_id:
+                return JsonResponse({'error': 'Missing food_id or container_id'}, status=400)
+            
+            # Get the catalog food and container
+            try:
+                catalog_food = CatalogFood.objects.get(pk=food_id)
+                container = Container.objects.get(pk=container_id, owner=request.user)
+            except CatalogFood.DoesNotExist:
+                return JsonResponse({'error': 'Food item not found'}, status=404)
+            except Container.DoesNotExist:
+                return JsonResponse({'error': 'Container not found or access denied'}, status=404)
+            
+            # Add or update the food in container
+            container_food, created = ContainerFood.objects.get_or_create(
+                container=container,
+                catalog_food=catalog_food,
+                defaults={'quantity': quantity}
+            )
+            
+            if not created:
+                # If item already exists, increase quantity
+                container_food.quantity += quantity
+                container_food.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Added {catalog_food.name} to {container.name}',
+                'created': created,
+                'new_quantity': container_food.quantity
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)
+
+# AJAX endpoint for batch adding foods to shopping list
+@login_required
+def batch_add_to_shopping_list(request):
+    """
+    AJAX endpoint to add multiple catalog food items to user's shopping list
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            food_ids = data.get('food_ids', [])
+            
+            if not food_ids:
+                return JsonResponse({'error': 'No food items provided'}, status=400)
+            
+            # Get or create user's shopping list
+            shopping_list, created = Container.objects.get_or_create(
+                owner=request.user,
+                container_type='SHOPPING',
+                defaults={
+                    'name': 'Shopping List',
+                    'description': 'Your personal shopping list'
+                }
+            )
+            
+            added_items = []
+            updated_items = []
+            
+            # Add each food item to shopping list
+            for food_id in food_ids:
+                try:
+                    catalog_food = CatalogFood.objects.get(pk=food_id)
+                    container_food, created = ContainerFood.objects.get_or_create(
+                        container=shopping_list,
+                        catalog_food=catalog_food,
+                        defaults={'quantity': 1}
+                    )
+                    
+                    if created:
+                        added_items.append({
+                            'id': catalog_food.pk,
+                            'name': catalog_food.name,
+                            'category': catalog_food.category,
+                            'quantity': container_food.quantity
+                        })
+                    else:
+                        # Item already exists, increase quantity
+                        container_food.quantity += 1
+                        container_food.save()
+                        updated_items.append({
+                            'id': catalog_food.pk,
+                            'name': catalog_food.name,
+                            'category': catalog_food.category,
+                            'quantity': container_food.quantity
+                        })
+                        
+                except CatalogFood.DoesNotExist:
+                    continue  # Skip invalid food IDs
+            
+            # Get updated shopping list count
+            shopping_count = shopping_list.items.count()
+            
+            return JsonResponse({
+                'success': True,
+                'added_items': added_items,
+                'updated_items': updated_items,
+                'shopping_count': shopping_count,
+                'message': f'Added {len(added_items)} new items and updated {len(updated_items)} existing items to your shopping list'
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)
+
+
+@login_required
+def move_shopping_item_to_container(request):
+    """
+    AJAX endpoint to move an item from shopping list to a selected container
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            from datetime import datetime, date
+            data = json.loads(request.body)
+            item_id = data.get('item_id')
+            container_id = data.get('container_id')
+            expiration_date = data.get('expiration_date')  # Optional explicit date
+            quantity = data.get('quantity', 1)
+            
+            # Get the shopping list item
+            try:
+                shopping_item = ContainerFood.objects.get(
+                    pk=item_id,
+                    container__owner=request.user,
+                    container__container_type='SHOPPING'
+                )
+            except ContainerFood.DoesNotExist:
+                return JsonResponse({'error': 'Shopping item not found'}, status=404)
+            
+            # Get the target container
+            try:
+                target_container = Container.objects.get(
+                    pk=container_id,
+                    owner=request.user
+                )
+            except Container.DoesNotExist:
+                return JsonResponse({'error': 'Container not found'}, status=404)
+            
+            # Parse expiration date if provided
+            parsed_expiration = None
+            if expiration_date:
+                try:
+                    parsed_expiration = datetime.strptime(expiration_date, '%Y-%m-%d').date()
+                except ValueError:
+                    return JsonResponse({'error': 'Invalid expiration date format'}, status=400)
+            
+            # Check if item already exists in target container
+            existing_item, created = ContainerFood.objects.get_or_create(
+                container=target_container,
+                catalog_food=shopping_item.catalog_food,
+                defaults={
+                    'quantity': quantity,
+                    'expiration_date': parsed_expiration,
+                    'is_frozen': target_container.container_type == 'FREEZER'
+                }
+            )
+            
+            if not created:
+                # Item already exists, increase quantity
+                existing_item.quantity += quantity
+                if parsed_expiration:
+                    existing_item.expiration_date = parsed_expiration
+                existing_item.save()
+            
+            # If no explicit expiration date was provided, let the model's save method calculate it
+            if created and not parsed_expiration:
+                existing_item.is_frozen = target_container.container_type == 'FREEZER'
+                existing_item.save()  # This will trigger default expiration calculation
+            
+            # Remove or reduce quantity from shopping list
+            if shopping_item.quantity > quantity:
+                shopping_item.quantity -= quantity
+                shopping_item.save()
+            else:
+                shopping_item.delete()
+            
+            # Get updated shopping list count
+            shopping_count = Container.objects.get(
+                owner=request.user,
+                container_type='SHOPPING'
+            ).items.count()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Moved {shopping_item.catalog_food.name} to {target_container.name}',
+                'shopping_count': shopping_count,
+                'expiration_date': existing_item.expiration_date.strftime('%Y-%m-%d') if existing_item.expiration_date else None
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)
+
+
+@login_required
+def batch_move_shopping_items(request):
+    """
+    AJAX endpoint to move multiple shopping list items to a selected container
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            from datetime import datetime
+            data = json.loads(request.body)
+            item_ids = data.get('item_ids', [])
+            container_id = data.get('container_id')
+            
+            if not item_ids:
+                return JsonResponse({'error': 'No items selected'}, status=400)
+            
+            if not container_id:
+                return JsonResponse({'error': 'No target container selected'}, status=400)
+            
+            # Get the target container
+            try:
+                target_container = Container.objects.get(
+                    pk=container_id,
+                    owner=request.user
+                )
+            except Container.DoesNotExist:
+                return JsonResponse({'error': 'Container not found'}, status=404)
+            
+            # Get all shopping items to be moved
+            shopping_items = ContainerFood.objects.filter(
+                pk__in=item_ids,
+                container__owner=request.user,
+                container__container_type='SHOPPING'
+            )
+            
+            if not shopping_items.exists():
+                return JsonResponse({'error': 'No valid shopping items found'}, status=404)
+            
+            moved_items = []
+            
+            # Process each shopping item
+            for shopping_item in shopping_items:
+                # Check if item already exists in target container
+                existing_item, created = ContainerFood.objects.get_or_create(
+                    container=target_container,
+                    catalog_food=shopping_item.catalog_food,
+                    defaults={
+                        'quantity': shopping_item.quantity,
+                        'is_frozen': target_container.container_type == 'FREEZER'
+                    }
+                )
+                
+                if not created:
+                    # Item already exists, increase quantity
+                    existing_item.quantity += shopping_item.quantity
+                    existing_item.save()
+                else:
+                    # New item, let model calculate default expiration
+                    existing_item.is_frozen = target_container.container_type == 'FREEZER'
+                    existing_item.save()
+                
+                moved_items.append({
+                    'name': shopping_item.catalog_food.name,
+                    'quantity': shopping_item.quantity
+                })
+                
+                # Remove from shopping list
+                shopping_item.delete()
+            
+            # Get updated shopping list count
+            shopping_count = Container.objects.get(
+                owner=request.user,
+                container_type='SHOPPING'
+            ).items.count()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Moved {len(moved_items)} items to {target_container.name}',
+                'moved_items': moved_items,
+                'shopping_count': shopping_count
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)
+
+
+@login_required
+def update_food_item(request):
+    """
+    AJAX endpoint to update a food item's properties (expiration date, quantity, etc.)
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            from datetime import datetime
+            data = json.loads(request.body)
+            item_id = data.get('item_id')
+            expiration_date = data.get('expiration_date')
+            quantity = data.get('quantity')
+            
+            # Get the food item
+            try:
+                food_item = ContainerFood.objects.get(
+                    pk=item_id,
+                    container__owner=request.user
+                )
+            except ContainerFood.DoesNotExist:
+                return JsonResponse({'error': 'Food item not found'}, status=404)
+            
+            # Update expiration date if provided
+            if expiration_date:
+                try:
+                    parsed_date = datetime.strptime(expiration_date, '%Y-%m-%d').date()
+                    food_item.expiration_date = parsed_date
+                except ValueError:
+                    return JsonResponse({'error': 'Invalid expiration date format'}, status=400)
+            
+            # Update quantity if provided
+            if quantity is not None:
+                if quantity < 0:
+                    return JsonResponse({'error': 'Quantity cannot be negative'}, status=400)
+                food_item.quantity = quantity
+            
+            food_item.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Updated {food_item.catalog_food.name}',
+                'expiration_date': food_item.expiration_date.strftime('%Y-%m-%d') if food_item.expiration_date else None,
+                'quantity': food_item.quantity,
+                'days_until_expiration': food_item.days_until_expiration,
+                'status_class': food_item.status_class
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)
+
+
+@login_required
+def delete_food_item(request):
+    """
+    AJAX endpoint to delete a food item with option to add to shopping list
+    """
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            item_id = data.get('item_id')
+            add_to_shopping = data.get('add_to_shopping', False)
+            
+            # Get the food item
+            try:
+                food_item = ContainerFood.objects.get(
+                    pk=item_id,
+                    container__owner=request.user
+                )
+            except ContainerFood.DoesNotExist:
+                return JsonResponse({'error': 'Food item not found'}, status=404)
+            
+            catalog_food = food_item.catalog_food
+            quantity = food_item.quantity
+            
+            # Add to shopping list if requested
+            shopping_count = 0
+            if add_to_shopping:
+                shopping_list, created = Container.objects.get_or_create(
+                    owner=request.user,
+                    container_type='SHOPPING',
+                    defaults={
+                        'name': 'Shopping List',
+                        'description': 'Your personal shopping list'
+                    }
+                )
+                
+                # Add or update quantity in shopping list
+                shopping_item, created = ContainerFood.objects.get_or_create(
+                    container=shopping_list,
+                    catalog_food=catalog_food,
+                    defaults={'quantity': quantity}
+                )
+                
+                if not created:
+                    shopping_item.quantity += quantity
+                    shopping_item.save()
+                
+                shopping_count = shopping_list.items.count()
+            
+            # Delete the food item
+            food_item.delete()
+            
+            message = f'Removed {catalog_food.name}'
+            if add_to_shopping:
+                message += f' and added to shopping list'
+            
+            return JsonResponse({
+                'success': True,
+                'message': message,
+                'shopping_count': shopping_count
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Only POST requests allowed'}, status=405)

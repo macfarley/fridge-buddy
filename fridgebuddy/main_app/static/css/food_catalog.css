@@ -1,0 +1,321 @@
+/* Food Catalog Styling */
+.catalog-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.food-catalog {
+    flex: 2;
+    min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.shopping-sidebar {
+    flex: 1;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 2rem;
+    max-height: 80vh;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.shopping-sidebar h2 {
+    color: #52C5A0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.shopping-list-empty {
+    color: #666666;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.shopping-item {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.shopping-item:last-child {
+    border-bottom: none;
+}
+
+.shopping-item-info {
+    flex: 1;
+}
+
+.shopping-item-name {
+    font-weight: 500;
+    color: #333333;
+    margin-bottom: 0.25rem;
+}
+
+.shopping-item-category {
+    font-size: 0.875rem;
+    color: #666666;
+    text-transform: capitalize;
+}
+
+.shopping-item-quantity {
+    background: #52C5A0;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    min-width: 2rem;
+    text-align: center;
+}
+
+/* Category headers with expand arrows */
+.category-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #52C5A0, #45B892);
+    color: white !important;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    user-select: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+}
+
+.category-header:hover {
+    background: linear-gradient(135deg, #45B892, #3DA77F);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(82, 197, 160, 0.3);
+}
+
+.category-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white !important;
+}
+
+.category-header[data-expanded="true"] .category-arrow {
+    transform: rotate(90deg);
+}
+
+.category-list {
+    list-style: none;
+    padding: 0;
+}
+
+.category-item {
+    margin-bottom: 1rem;
+}
+
+.food-list {
+    list-style: none;
+    padding: 0;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.food-item {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.food-item:last-child {
+    border-bottom: none;
+}
+
+.food-item:hover {
+    background: #f0f8f5;
+}
+
+.food-checkbox {
+    flex-shrink: 0;
+}
+
+.food-item-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.food-item-info h3 {
+    margin: 0 0 0.25rem 0;
+    color: #333333;
+    font-size: 1.1rem;
+}
+
+.food-item-description {
+    color: #666666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.food-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.container-select {
+    min-width: 150px;
+    padding: 0.5rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    color: var(--gray-800);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.container-select:focus {
+    outline: none;
+    border-color: var(--primary-mint);
+    box-shadow: 0 0 0 3px rgba(82, 197, 160, 0.1);
+}
+
+.add-to-container-btn {
+    background: linear-gradient(135deg, var(--primary-mint) 0%, var(--primary-mint-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.add-to-container-btn:hover {
+    background: linear-gradient(135deg, var(--primary-mint-light) 0%, var(--primary-mint) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.batch-actions {
+    position: sticky;
+    bottom: 2rem;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-xl);
+    padding: 1rem;
+    box-shadow: var(--shadow-lg);
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#batch-add-btn {
+    background: linear-gradient(135deg, var(--primary-mint) 0%, var(--primary-mint-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+#batch-add-btn:hover {
+    background: linear-gradient(135deg, var(--primary-mint-light) 0%, var(--primary-mint) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+#batch-add-btn:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+#selected-count {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.add-food-section {
+    text-align: center;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 2px dashed var(--gray-300);
+    margin-top: 2rem;
+}
+
+.add-food-section h2 {
+    color: var(--gray-800);
+    margin-bottom: 1rem;
+}
+
+/* Success animations */
+.shopping-item-new {
+    animation: slideInRight 0.5s ease-out;
+    background: var(--success-green);
+    color: white;
+    border-radius: var(--radius-lg);
+    margin-bottom: 0.5rem;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .catalog-layout {
+        flex-direction: column;
+    }
+    
+    .shopping-sidebar {
+        position: static;
+        max-height: none;
+        order: -1; /* Show shopping list at top on mobile */
+    }
+}
+
+@media (max-width: 768px) {
+    .food-item-content {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .food-item-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    
+    .container-select {
+        min-width: 120px;
+    }
+}

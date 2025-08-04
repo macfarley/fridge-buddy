@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Shopping List - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/shopping_list.css' %}" />
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="shopping-page">
+    <div class="shopping-header">
+        <h1>🛒 My Shopping List</h1>
+        {% if shopping_list.items.count > 0 %}
+            <p class="item-count">{{ shopping_list.items.count }} item{{ shopping_list.items.count|pluralize }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if shopping_list.items.count > 0 %}
+        <!-- Batch Operations Form -->
+        <form method="post" id="batch-operations-form" style="display: none;">
+            {% csrf_token %}
+            <div class="batch-operations" id="batch-operations">
+                <div class="batch-info">
+                    <span id="selected-count">0</span> items selected
+                </div>
+                <div class="batch-actions">
+                    {{ batch_move_form.selected_items }}
+                    {{ batch_move_form.target_container }}
+                    <button type="submit" name="batch_move" class="btn btn-primary">Move Selected</button>
+                    <button type="button" class="btn btn-secondary" data-action="clear-selection">Clear Selection</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="shopping-container">
+            <!-- Shopping List Panel -->
+            <div class="shopping-panel">
+                <div class="panel-header">
+                    <span>🛒 Shopping List</span>
+                    <div class="header-controls">
+                        <label class="select-all-label">
+                            <input type="checkbox" id="select-all-shopping"> Select All
+                        </label>
+                        <span class="badge">{{ shopping_list.items.count }}</span>
+                    </div>
+                </div>
+                
+                <div class="shopping-items">
+                    {% for item in shopping_list.items.all %}
+                        <div class="shopping-item" data-item-id="{{ item.pk }}">
+                            <input type="checkbox" class="item-checkbox" 
+                                   data-item-id="{{ item.pk }}">
+                            
+                            <div class="item-info">
+                                <div class="item-name">{{ item.catalog_food.name }}</div>
+                                <div class="item-details">
+                                    {{ item.catalog_food.category|title }}
+                                    {% if item.catalog_food.description %}
+                                        • {{ item.catalog_food.description }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="item-quantity">{{ item.quantity }}</div>
+                            
+                            <button type="button" class="move-btn" data-action="show-move-modal" data-item-id="{{ item.pk }}" data-item-name="{{ item.catalog_food.name }}" data-quantity="{{ item.quantity }}">
+                                Move →
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Container Panel -->
+            <div class="shopping-panel">
+                <div class="panel-header">
+                    <span id="container-title">
+                        {% if selected_container %}
+                            📦 {{ selected_container.name }}
+                        {% else %}
+                            📦 Select Container
+                        {% endif %}
+                    </span>
+                    <span id="container-count" class="badge">
+                        {% if selected_container %}
+                            {{ selected_container_items.count }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="container-selector">
+                    <form method="get">
+                        <label for="{{ container_selection_form.selected_container.id_for_label }}">Choose a container:</label>
+                        {{ container_selection_form.selected_container }}
+                    </form>
+                </div>
+                
+                <div id="container-contents" class="container-contents">
+                    {% if selected_container %}
+                        {% if selected_container_items %}
+                            {% for item in selected_container_items %}
+                                <div class="container-item">
+                                    <div class="item-info">
+                                        <div class="item-name">{{ item.catalog_food.name }}</div>
+                                        {% if item.expiration_date %}
+                                            <div class="expiration-info {{ item.status_class }}">
+                                                {% if item.is_expired %}
+                                                    Expired {{ item.days_until_expiration|add:"-1" }} days ago
+                                                {% elif item.expires_soon %}
+                                                    Expires in {{ item.days_until_expiration }} days
+                                                {% else %}
+                                                    {{ item.days_until_expiration }} days remaining
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-quantity">{{ item.quantity }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-container">
+                                <h3>Empty {{ selected_container.name }}</h3>
+                                <p>No items in this container yet</p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-container">
+                            <h3>Select a container</h3>
+                            <p>Choose a container from the dropdown to see its contents</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Checked Items Form -->
+        <div class="actions-bar">
+            <form method="post" id="clear-checked-form" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="checked_items" id="checked-items-input" value="">
+                <button type="submit" name="clear_checked" id="clear-checked" class="btn btn-secondary">Clear Checked Items</button>
+            </form>
+            <a href="{% url 'food-catalog' %}" class="btn btn-primary">Add More Items</a>
+        </div>
+    {% else %}
+        <div class="empty-shopping-list">
+            <h2>Your shopping list is empty</h2>
+            <p>Add items from the food catalog to get started!</p>
+            <a href="{% url 'food-catalog' %}" class="btn btn-primary">Browse Food Catalog</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Move Item Modal -->
+<div id="moveModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Move Item to Container</h3>
+            <button class="close-btn" data-action="close-move-modal">&times;</button>
+        </div>
+        
+        <div id="modal-body">
+            <p><strong id="modal-item-name"></strong></p>
+            <p>Quantity: <span id="modal-quantity"></span></p>
+            <p>Moving to: <span id="modal-container-name"></span></p>
+            
+            <div class="form-group">
+                <label for="expiration-date">Expiration Date (optional):</label>
+                <input type="date" id="expiration-date" />
+                <small>Leave blank to use default expiration based on food category</small>
+            </div>
+            
+            <div id="default-expiration-info" style="margin-top: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+                <strong>Default expiration:</strong> <span id="default-expiration-text"></span>
+            </div>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-move-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="confirm-move">Move Item</button>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/shopping_list.js' %}"></script>
+<script>
+// Template-specific configuration
+const moveToContainerUrl = '{% url "move-to-container" %}';
+
+// Initialize batch operations functionality
+let selectedShoppingItems = new Set();
+
+// Handle individual checkbox changes for batch operations
+document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const itemId = this.dataset.itemId;
+        
+        if (this.checked) {
+            selectedShoppingItems.add(itemId);
+        } else {
+            selectedShoppingItems.delete(itemId);
+        }
+        
+        updateBatchOperations();
+    });
+});
+
+// Handle "Select All" checkbox
+document.getElementById('select-all-shopping')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+        
+        const itemId = checkbox.dataset.itemId;
+        if (this.checked) {
+            selectedShoppingItems.add(itemId);
+        } else {
+            selectedShoppingItems.delete(itemId);
+        }
+    });
+    
+    updateBatchOperations();
+});
+
+// Update batch operations visibility and form data
+function updateBatchOperations() {
+    const batchForm = document.getElementById('batch-operations-form');
+    const batchOps = document.getElementById('batch-operations');
+    const selectedCount = document.getElementById('selected-count');
+    const selectedItemsInput = document.querySelector('input[name="selected_items"]');
+    
+    if (selectedShoppingItems.size > 0) {
+        batchForm.style.display = 'block';
+        selectedCount.textContent = selectedShoppingItems.size;
+        selectedItemsInput.value = Array.from(selectedShoppingItems).join(',');
+    } else {
+        batchForm.style.display = 'none';
+    }
+}
+
+// Clear all selections
+function clearSelection() {
+    selectedShoppingItems.clear();
+    
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    document.getElementById('select-all-shopping').checked = false;
+    updateBatchOperations();
+}
+
+// Handle clear checked items with server-side form submission
+document.getElementById('clear-checked')?.addEventListener('click', function(e) {
+    const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+    
+    if (checkedItems.length === 0) {
+        e.preventDefault();
+        alert('No items are checked to clear.');
+        return;
+    }
+    
+    if (!confirm(`Remove ${checkedItems.length} checked item${checkedItems.length !== 1 ? 's' : ''} from your shopping list?`)) {
+        e.preventDefault();
+        return;
+    }
+    
+    // Populate hidden input with checked item IDs
+    const itemIds = Array.from(checkedItems).map(cb => cb.dataset.itemId);
+    document.getElementById('checked-items-input').value = itemIds.join(',');
+});
+
+// Handle container selection changes
+const containerSelect = document.querySelector('select[name="selected_container"]');
+if (containerSelect) {
+    containerSelect.addEventListener('change', function() {
+        const form = this.closest('form');
+        form.submit();
+    });
+}
+</script>
+{% endblock %}

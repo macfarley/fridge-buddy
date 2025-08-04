@@ -2,15 +2,10 @@
 {% load static %} 
 
 {% block head %}
-<link
-  rel="stylesheet"
-  href="{% static 'css/home.css' %}"
-/>
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
 {% endblock %} 
 
 {% block content %}
-
-
 <section class="hero-section">
   <div class="fridge-container">
     <img
@@ -19,18 +14,23 @@
       class="splash-image"
     />
   </div>
-  <h1>Welcome to Fridge Buddy</h1>
+  <h1>🧊 Welcome to Fridge Buddy</h1>
   <p>Your smart companion for managing food and reducing waste</p>
-  <p>Just add your food items and let Fridge Buddy help you keep track!</p>
+  <p>Keep track of your food items and never let anything go bad again!</p>
+  
+  {% if user_authenticated %}
+    <div class="auth-panel">
+      <a href="{% url 'dashboard' %}" class="btn btn-primary">🏠 Go to Dashboard</a>
+      <a href="{% url 'my-lists' %}" class="btn btn-secondary">📋 My Containers</a>
+    </div>
+  {% endif %}
 </section>
-
-
 
 <section class="auth-section">
   {% if not user_authenticated %}
     <div class="auth-panel bottom">
-      <a href="/accounts/login/" class="btn btn-primary">Sign In</a>
-      <a href="/accounts/signup/" class="btn btn-secondary">Sign Up</a>
+      <a href="/accounts/login/" class="btn btn-primary">🔑 Sign In</a>
+      <a href="/accounts/signup/" class="btn btn-secondary">📝 Sign Up</a>
     </div>
   {% endif %}
 </section>

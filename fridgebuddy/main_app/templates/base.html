@@ -27,7 +27,15 @@
         <img src="{% static 'images/fridgebuddy.png' %}" alt="Fridge Buddy logo" class="header-logo" />
         </a>
       </div>
-      <nav>
+      
+      <!-- Hamburger menu button for mobile -->
+      <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      
+      <nav id="main-nav">
         <ul>
           <li><a href="{% url 'about' %}">About</a></li>
           <li><a href="{% url 'food-catalog' %}">All Foods</a></li>
@@ -35,6 +43,14 @@
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li><a href="{% url 'food-create' %}">Add a Food Item</a></li>
             <li><a href="{% url 'my-lists' %}">My Lists</a></li>
+            <li>
+              <a href="{% url 'shopping-list' %}" class="shopping-nav-link">
+                🛒 Shopping List
+                {% if shopping_list_count > 0 %}
+                  <span class="shopping-counter">{{ shopping_list_count }}</span>
+                {% endif %}
+              </a>
+            </li>
             <li><a href="{% url 'logout' %}">Logout ({{ user.username }})</a></li>
           {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
@@ -47,5 +63,37 @@
      {% block content %} 
      {% endblock %}
      </main>
+     
+     <script>
+       // Hamburger menu functionality
+       document.addEventListener('DOMContentLoaded', function() {
+         const hamburgerMenu = document.getElementById('hamburger-menu');
+         const mainNav = document.getElementById('main-nav');
+         
+         if (hamburgerMenu && mainNav) {
+           hamburgerMenu.addEventListener('click', function() {
+             hamburgerMenu.classList.toggle('active');
+             mainNav.classList.toggle('active');
+           });
+           
+           // Close menu when clicking on a link (for mobile)
+           const navLinks = mainNav.querySelectorAll('a');
+           navLinks.forEach(link => {
+             link.addEventListener('click', () => {
+               hamburgerMenu.classList.remove('active');
+               mainNav.classList.remove('active');
+             });
+           });
+           
+           // Close menu when clicking outside
+           document.addEventListener('click', function(event) {
+             if (!hamburgerMenu.contains(event.target) && !mainNav.contains(event.target)) {
+               hamburgerMenu.classList.remove('active');
+               mainNav.classList.remove('active');
+             }
+           });
+         }
+       });
+     </script>
   </body>
 </html>

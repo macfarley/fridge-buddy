@@ -1,5 +1,237 @@
 /* Fridge page specific styles */
 
+/* Page Section Wrappers for Visual Separation */
+.page-header-section {
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.containers-section {
+    background: linear-gradient(135deg, var(--white) 0%, var(--mint-background) 100%);
+    border: 3px solid var(--primary-mint);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+    box-shadow: 0 8px 25px rgba(82, 197, 160, 0.15);
+    position: relative;
+}
+
+.containers-section::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-mint), var(--primary-mint-light));
+    border-radius: var(--radius-xl);
+    z-index: -1;
+}
+
+.empty-state-section {
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.add-form-section {
+    background: linear-gradient(135deg, var(--mint-background) 0%, var(--white) 100%);
+    border: 3px solid var(--primary-mint-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-6);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.add-form-section::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-mint-light), var(--primary-mint));
+    border-radius: var(--radius-xl);
+    z-index: -1;
+}
+
+/* Container Grid and Card Styles */
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 0;
+}
+
+.container-card {
+    background: var(--white);
+    border: 3px solid var(--gray-300);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-6);
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.container-card:hover {
+    border-color: var(--primary-mint);
+    box-shadow: 0 8px 25px rgba(82, 197, 160, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.container-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(82, 197, 160, 0.02) 0%, rgba(82, 197, 160, 0.05) 100%);
+    border-radius: var(--radius-xl);
+    z-index: -1;
+}
+
+.container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.container-header h3 {
+    color: var(--gray-900);
+    margin: 0;
+    font-size: var(--font-size-xl);
+}
+
+.container-type {
+    background: var(--primary-mint);
+    color: var(--white);
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.container-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+    padding: var(--spacing-3);
+    background: var(--mint-subtle);
+    border-radius: var(--radius-md);
+}
+
+.item-count {
+    color: var(--gray-700);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.total-quantity {
+    color: var(--primary-mint-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.container-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+}
+
+.container-actions .btn {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* Special styling for View Items button */
+.container-actions .btn-secondary {
+    border: 2px solid var(--primary-mint) !important;
+    background: var(--white) !important;
+    color: var(--primary-mint-dark) !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.container-actions .btn-secondary:hover {
+    background: var(--primary-mint) !important;
+    color: var(--white) !important;
+    border-color: var(--primary-mint-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(82, 197, 160, 0.3) !important;
+}
+
+/* Quick Add Section - moved to bottom */
+.quick-add-section {
+    background: var(--white);
+    border: 2px solid var(--primary-mint-dark);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-top: 0;
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(82, 197, 160, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.quick-add-section:hover {
+    border-color: var(--primary-mint);
+    box-shadow: inset 0 2px 4px rgba(82, 197, 160, 0.15);
+    transform: translateY(-1px);
+}
+
+.quick-add-section h2 {
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-4);
+}
+
+.inline-container-form .form-row {
+    display: flex;
+    gap: var(--spacing-4);
+    align-items: end;
+    justify-content: center;
+}
+
+.inline-container-form .form-group {
+    flex: 1;
+    max-width: 200px;
+}
+
+.inline-container-form .form-group:last-child {
+    flex: 0;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-8);
+    color: var(--gray-600);
+    background: var(--mint-subtle);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--primary-mint-light);
+}
+
+.empty-state h3 {
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-4);
+}
+
 .page-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -289,6 +521,37 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .page-header-section,
+    .containers-section,
+    .empty-state-section,
+    .add-form-section {
+        margin-bottom: var(--spacing-4);
+        padding: var(--spacing-4);
+    }
+    
+    .container-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .inline-container-form .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .inline-container-form .form-group {
+        max-width: none;
+    }
+    
+    .container-actions {
+        flex-direction: column;
+    }
+    
+    .container-stats {
+        flex-direction: column;
+        gap: var(--spacing-2);
+        text-align: center;
+    }
+    
     .fridge-stats {
         grid-template-columns: 1fr;
     }

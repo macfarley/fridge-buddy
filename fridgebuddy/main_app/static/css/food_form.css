@@ -1,0 +1,228 @@
+/* Food Form Styles - Catalog Food Creation/Editing */
+
+/* Page Section Wrappers for Visual Separation */
+.page-header-section {
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.form-section {
+    background: linear-gradient(135deg, var(--white) 0%, var(--mint-background) 100%);
+    border: 3px solid var(--primary-mint);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+    box-shadow: 0 8px 25px rgba(82, 197, 160, 0.15);
+    position: relative;
+}
+
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-mint), var(--primary-mint-light));
+    border-radius: var(--radius-xl);
+    z-index: -1;
+}
+
+/* Form Controls with Mint Theme */
+.form-control {
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-3);
+    font-size: var(--font-size-base);
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-mint);
+    border-width: 3px;
+    box-shadow: 0 0 0 3px rgba(82, 197, 160, 0.1);
+}
+
+.form-control:hover {
+    border-color: var(--primary-mint-light);
+}
+
+/* Form Layout */
+.form-header {
+    margin-bottom: var(--spacing-6);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-mint-dark);
+    text-decoration: none;
+    margin-bottom: var(--spacing-4);
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--primary-mint);
+}
+
+.form-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    box-shadow: var(--shadow-lg);
+    border: 3px solid var(--gray-300);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.form-card:hover {
+    border-color: var(--primary-mint-light);
+    box-shadow: 0 8px 25px rgba(82, 197, 160, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(82, 197, 160, 0.02) 0%, rgba(82, 197, 160, 0.05) 100%);
+    border-radius: var(--radius-xl);
+    z-index: -1;
+}
+
+.food-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-6);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+/* Checkbox Group Styling */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: var(--mint-subtle);
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-4) 0;
+    border: 2px solid var(--primary-mint-light);
+    transition: all 0.2s ease;
+}
+
+.checkbox-group:hover {
+    background: var(--primary-mint-light);
+    border-color: var(--primary-mint);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-mint);
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+/* Hidden Fields */
+.hidden-field {
+    display: none;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-4);
+    justify-content: center;
+    margin-top: var(--spacing-8);
+    padding-top: var(--spacing-6);
+    border-top: 1px solid var(--gray-200);
+}
+
+/* Error Styling */
+.form-errors {
+    margin-top: var(--spacing-2);
+}
+
+.form-errors .error {
+    display: block;
+    color: var(--danger-red);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* Textarea Specific Styling */
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Select Dropdown Styling */
+select.form-control {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-3) center;
+    background-size: 1rem;
+    padding-right: calc(var(--spacing-8) + var(--spacing-3));
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header-section,
+    .form-section {
+        margin-bottom: var(--spacing-4);
+        padding: var(--spacing-4);
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-4);
+    }
+    
+    .form-card {
+        padding: var(--spacing-6);
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .checkbox-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-2);
+    }
+}

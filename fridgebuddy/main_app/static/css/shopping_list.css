@@ -1,0 +1,404 @@
+/*
+SHOPPING LIST PAGE STYLES
+
+This CSS file contains all styles specific to the shopping list page,
+including the side-by-side layout, container selection, and batch operations.
+
+Key Features:
+1. Responsive grid layout (side-by-side on desktop, stacked on mobile)
+2. Shopping list panel with item management
+3. Container selection and contents display
+4. Batch operations interface
+5. Modal dialogs for item management
+6. Interactive animations and transitions
+*/
+
+/* =============================================================================
+   PAGE LAYOUT
+   ============================================================================= */
+
+.shopping-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.shopping-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.shopping-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.item-count {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.shopping-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .shopping-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* =============================================================================
+   PANEL COMPONENTS
+   ============================================================================= */
+
+.shopping-panel {
+    background: var(--surface-color);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+}
+
+.panel-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.select-all-label {
+    font-size: 0.9rem;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+}
+
+.select-all-label input[type="checkbox"] {
+    margin: 0;
+}
+
+.container-selector {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background: #f8f9fa;
+}
+
+.container-selector label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.container-selector select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+/* =============================================================================
+   ITEM LISTS
+   ============================================================================= */
+
+.shopping-items, .container-contents {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.shopping-item, .container-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.shopping-item:last-child, .container-item:last-child {
+    border-bottom: none;
+}
+
+.shopping-item:hover, .container-item:hover {
+    background: var(--hover-color);
+}
+
+.item-checkbox {
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.item-details {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.item-quantity {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.move-btn {
+    background: var(--warning-color);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.move-btn:hover {
+    background: #e56308;
+}
+
+.move-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* =============================================================================
+   BATCH OPERATIONS
+   ============================================================================= */
+
+.batch-operations {
+    background: #f8f9fa;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+.batch-info {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.batch-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.form-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    min-width: 200px;
+}
+
+/* =============================================================================
+   EMPTY STATES
+   ============================================================================= */
+
+.empty-shopping-list, .empty-container {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+}
+
+.empty-shopping-list h2, .empty-container h2 {
+    margin-bottom: 1rem;
+}
+
+.actions-bar {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.checked-off {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+/* =============================================================================
+   STATUS INDICATORS
+   ============================================================================= */
+
+.expiration-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.expires-soon {
+    color: var(--warning-color);
+}
+
+.expired {
+    color: var(--danger-color);
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+/* =============================================================================
+   MODAL STYLES
+   ============================================================================= */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-btn:hover {
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(-100%); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .shopping-page {
+        padding: 1rem;
+    }
+    
+    .batch-operations {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .batch-actions {
+        justify-content: center;
+    }
+    
+    .form-select {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}

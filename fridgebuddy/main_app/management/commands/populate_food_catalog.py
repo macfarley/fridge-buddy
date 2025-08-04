@@ -37,52 +37,52 @@ class Command(BaseCommand):
             sample_foods = [
                 {
                     "name": "Chicken Breast",
-                    "category": "MEAT",
+                    "category": "meat",
                     "description": "Boneless, skinless chicken breast"
                 },
                 {
                     "name": "Whole Milk",
-                    "category": "DAIRY",
+                    "category": "dairy",
                     "description": "Fresh whole milk, 3.25% fat"
                 },
                 {
                     "name": "Bananas",
-                    "category": "FRUIT",
+                    "category": "fruits",
                     "description": "Fresh yellow bananas"
                 },
                 {
                     "name": "Spinach",
-                    "category": "VEGETABLE",
+                    "category": "vegetables",
                     "description": "Fresh baby spinach leaves"
                 },
                 {
                     "name": "White Bread",
-                    "category": "GRAIN",
+                    "category": "grains",
                     "description": "Sliced white bread loaf"
                 },
                 {
                     "name": "Cheddar Cheese",
-                    "category": "DAIRY",
+                    "category": "dairy",
                     "description": "Sharp cheddar cheese block"
                 },
                 {
                     "name": "Ground Beef",
-                    "category": "MEAT",
+                    "category": "meat",
                     "description": "80/20 ground beef"
                 },
                 {
                     "name": "Apples",
-                    "category": "FRUIT",
+                    "category": "fruits",
                     "description": "Fresh red apples"
                 },
                 {
                     "name": "Carrots",
-                    "category": "VEGETABLE", 
+                    "category": "vegetables", 
                     "description": "Fresh baby carrots"
                 },
                 {
                     "name": "Brown Rice",
-                    "category": "GRAIN",
+                    "category": "grains",
                     "description": "Long grain brown rice"
                 }
             ]

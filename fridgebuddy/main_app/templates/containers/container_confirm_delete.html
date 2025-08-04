@@ -2,13 +2,20 @@
 
 {% block content %}
   <div class="container">
-    <h1>Confirm Deletion</h1>
-    <p>Are you sure you want to delete the container "{{ object.name }}"?</p>
+    <div class="card">
+      <h1>⚠️ Confirm Deletion</h1>
+      <div class="alert alert-danger">
+        <p><strong>Warning:</strong> Are you sure you want to delete the container "<strong>{{ object.name }}</strong>"?</p>
+        <p>This action cannot be undone and will permanently remove all food items in this container.</p>
+      </div>
 
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Yes, delete</button>
-      <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+      <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+          <button type="submit" class="btn btn-danger">🗑️ Yes, delete permanently</button>
+          <a href="{% url 'my-lists' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
   </div>
 {% endblock %}

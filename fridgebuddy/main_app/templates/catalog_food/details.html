@@ -25,7 +25,7 @@
       <!-- Dropdown for selecting a container to move the food to -->
       <select class="container-select" data-food-id="{{ food.pk }}">
         <option value="">Select Container</option>
-        {% for container in user.container_set.all %}
+        {% for container in user.containers.all %}
           <option value="{{ container.pk }}">{{ container.name }}</option>
         {% endfor %}
       </select>
@@ -35,6 +35,6 @@
   </div>
 
   <!-- Back button to return to the catalog -->
-  <a href="{% url 'food-index' %}" class="btn btn-secondary">Back to Catalog</a>
+  <a href="{% url 'food-catalog' %}" class="btn btn-secondary">Back to Catalog</a>
 {% endblock %}
 

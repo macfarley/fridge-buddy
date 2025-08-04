@@ -1,26 +1,49 @@
 {% extends "base.html" %}
-{% comment %}This is where the User lands on a successful login {% endcomment %}
+{% load static %}
 {% block title %}Dashboard - Fridge Buddy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+{% endblock %}
+
 {% block content %}
 <div class="dashboard">
-  <h1>Welcome, {{ user.first_name }}!</h1>
-  <p>Email: {{ user.email }}</p>
-  <p>Birthday: {{ user.profile.birthday|date:"F j, Y" }}</p>
-  {% if user.profile.birthday and user.profile.birthday|date:"m-d" == today|date:"m-d" %}
-    <p>🎂 Happy Birthday, {{ user.first_name }}! 🎉</p>
-  {% endif %}
-  {% comment %} might add functionality to add profile images later. <img src="{{ user.profile.profile_image.url }}" alt="Profile Image" class="profile-image"> {% endcomment %}
+  <div class="profile-info">
+    <h1>Welcome, {{ user.first_name }}!</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Birthday: {{ user.profile.birthday|date:"F j, Y" }}</p>
+    {% if user.profile.birthday and user.profile.birthday|date:"m-d" == today|date:"m-d" %}
+      <div class="birthday-message">
+        🎂 Happy Birthday, {{ user.first_name }}! 🎉
+      </div>
+    {% endif %}
+  </div>
 
-  <h2>Your Containers</h2>
-  <ul>
-    {% for container in container_list %}
-      <li>
-        <a href="{% url 'food-index' container.id %}">{{ container.name }}</a> - {{ container.container_type }}
-      </li>
-    {% empty %}
-      <p>You have no containers yet. <a href="{% url 'container-create' %}">Create one now</a>.</p>
+  <div class="containers-section">
+    <h2>Your Containers</h2>
+    {% if container_list %}
+      <ul class="container-list">
+        {% for container in container_list %}
+          <li>
+            <a href="{% url 'food-index' container.id %}">{{ container.name }} - {{ container.container_type }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-containers">
+        <p>You have no containers yet. <a href="{% url 'container-create' %}">Create one now</a>.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Display Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
     {% endfor %}
-  </ul>
+  {% endif %}
 
   <div id="profile-update-panel" class="hidden-panel">
     <h2>Update Profile</h2>
@@ -42,34 +65,15 @@
         <label for="id_birthday">Birthday:</label>
         <input type="date" name="birthday" id="id_birthday" value="{{ user.profile.birthday|date:'Y-m-d' }}" class="form-control">
       </div>
-      {% comment %}
-      <div class="form-group">
-        <label for="id_profile_image">Profile Image:</label>
-        <input type="file" name="profile_image" id="id_profile_image" class="form-control">
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+        <button type="button" class="btn btn-secondary">Cancel</button>
       </div>
-      {% endcomment %}
-      <button type="submit" class="btn btn-primary">Update Profile</button>
-      <button type="button" class="btn btn-secondary" onclick="toggleProfilePanel()">Cancel</button>
     </form>
   </div>
 
-  <script>
-    function toggleProfilePanel() {
-      const panel = document.getElementById('profile-update-panel');
-      panel.classList.toggle('hidden-panel');
-    }
-  </script>
-
-  <style>
-    .hidden-panel {
-      display: none;
-    }
-    .hidden-panel.active {
-      display: block;
-    }
-  </style>
-
-  <button class="btn btn-link" onclick="toggleProfilePanel()">Edit Profile</button>
+  <button class="btn btn-primary edit-profile-btn">✏️ Edit Profile</button>
 </div>
-{% endblock %}
 
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

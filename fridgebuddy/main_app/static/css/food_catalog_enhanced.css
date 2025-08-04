@@ -1,0 +1,402 @@
+/*
+FOOD CATALOG SPECIFIC STYLES
+
+This CSS provides styling for the food catalog page with category management,
+batch operations, and shopping list sidebar functionality.
+*/
+
+/* =============================================================================
+   CATALOG LAYOUT
+   ============================================================================= */
+
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .catalog-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.food-catalog {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    border: 1px solid var(--gray-200);
+}
+
+/* =============================================================================
+   CATEGORY MANAGEMENT
+   ============================================================================= */
+
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    margin-bottom: 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.category-header {
+    background: var(--primary-mint);
+    color: white;
+    padding: 1rem;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+    user-select: none;
+}
+
+.category-header:hover {
+    background: var(--primary-mint-dark);
+}
+
+.category-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+
+.category-header[data-expanded="true"] .category-arrow {
+    transform: rotate(90deg);
+}
+
+.food-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: var(--white);
+}
+
+/* =============================================================================
+   FOOD ITEMS
+   ============================================================================= */
+
+.food-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: background-color 0.2s;
+}
+
+.food-item:hover {
+    background: var(--gray-50);
+}
+
+.food-item:last-child {
+    border-bottom: none;
+}
+
+.food-checkbox {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.food-item-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.food-item-info {
+    flex: 1;
+}
+
+.food-item-info h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--gray-800);
+    font-size: 1.1rem;
+}
+
+.food-item-description {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.food-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.container-select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    min-width: 150px;
+}
+
+.add-to-container-btn {
+    padding: 0.25rem 0.75rem;
+    background: var(--primary-mint);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.add-to-container-btn:hover {
+    background: var(--primary-mint-dark);
+}
+
+.add-to-container-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* =============================================================================
+   BATCH ACTIONS
+   ============================================================================= */
+
+.batch-actions {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+#batch-add-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+#selected-count {
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+/* =============================================================================
+   ADD FOOD SECTION
+   ============================================================================= */
+
+.add-food-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    text-align: center;
+}
+
+.add-food-section h2 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-800);
+}
+
+/* =============================================================================
+   SHOPPING SIDEBAR
+   ============================================================================= */
+
+.shopping-sidebar {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.shopping-sidebar h2 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-mint);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.shopping-sidebar h2 a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s;
+}
+
+.shopping-sidebar h2 a:hover {
+    color: var(--primary-mint-dark);
+}
+
+#shopping-list-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.shopping-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    margin-bottom: 0.5rem;
+    background: var(--white);
+    transition: background-color 0.2s;
+}
+
+.shopping-item:hover {
+    background: var(--gray-50);
+}
+
+.shopping-item:last-child {
+    margin-bottom: 0;
+}
+
+.shopping-item-info {
+    flex: 1;
+}
+
+.shopping-item-name {
+    font-weight: 500;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.shopping-item-category {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    text-transform: capitalize;
+}
+
+.shopping-item-quantity {
+    background: var(--primary-mint);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    min-width: 30px;
+    text-align: center;
+}
+
+.shopping-list-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--gray-600);
+    font-style: italic;
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .catalog-layout {
+        padding: 1rem;
+    }
+    
+    .food-catalog,
+    .shopping-sidebar {
+        padding: 1rem;
+    }
+    
+    .food-item-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .food-item-actions {
+        justify-content: stretch;
+    }
+    
+    .container-select {
+        min-width: auto;
+        flex: 1;
+    }
+    
+    .batch-actions {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .shopping-sidebar {
+        position: static;
+        margin-top: 1rem;
+    }
+    
+    .category-header {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .food-item {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .food-checkbox {
+        align-self: flex-start;
+    }
+}
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        max-height: 1000px;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.food-list[data-animating="show"] {
+    animation: slideDown 0.3s ease-out;
+}
+
+.food-list[data-animating="hide"] {
+    animation: slideUp 0.3s ease-out;
+}

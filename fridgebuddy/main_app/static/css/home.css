@@ -1,14 +1,17 @@
-/* Home page specific styles */
+/* Home Page Styles - Minty Fresh Theme */
 
 .hero-section {
     text-align: center;
     padding: 4rem 2rem;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--mint-background) 0%, var(--white) 100%);
     min-height: 60vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-8);
+    box-shadow: var(--shadow-md);
 }
 
 .fridge-container {
@@ -18,22 +21,45 @@
 .splash-image {
     width: 250px;
     height: auto;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     animation: float 3s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+.splash-image:hover {
+    transform: scale(1.05) rotate(2deg);
 }
 
 .hero-section h1 {
     font-size: 3rem;
-    color: #2c3e50;
+    color: var(--primary-mint-dark);
     margin-bottom: 1rem;
     font-weight: 700;
 }
 
 .hero-section p {
     font-size: 1.2rem;
-    color: #7f8c8d;
+    color: var(--gray-600);
     max-width: 600px;
     margin: 0 auto;
+    margin-bottom: var(--spacing-4);
+}
+
+/* Auth Panel Styles */
+.auth-panel {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-6);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--mint-subtle);
+    margin-top: var(--spacing-6);
+}
+
+.auth-panel.bottom {
+    margin-top: var(--spacing-12);
 }
 
 /* Floating animation for the splash image */
@@ -65,6 +91,12 @@
     
     .hero-section p {
         font-size: 1.1rem;
+    }
+    
+    .auth-panel {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
     }
 }
 

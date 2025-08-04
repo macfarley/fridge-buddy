@@ -1,0 +1,436 @@
+/*
+INTERACTIVE CONTAINER DETAILS STYLING
+
+This CSS provides styling for the interactive elements in the container details view.
+It focuses on user experience with clear visual hierarchy and interactive feedback.
+
+Key Design Principles:
+1. Visual Feedback: Hover states and color coding for status
+2. Accessibility: Clear contrast and readable fonts
+3. Responsive Layout: Flexible grid system for different screen sizes
+4. Interactive Elements: Styled buttons and controls for touch/click
+*/
+
+/* =============================================================================
+   DYNAMIC OPERATION BARS
+   ============================================================================= */
+
+/* 
+BATCH OPERATIONS & QUANTITY CHANGES BARS
+These bars appear dynamically when users have selections or pending changes.
+Styled to be prominent but not overwhelming.
+*/
+.batch-operations, .quantity-changes {
+    background: #f8f9fa;              /* Light background for subtle prominence */
+    border: 1px solid #dee2e6;       /* Soft border for definition */
+    border-radius: 8px;              /* Rounded corners for modern look */
+    padding: 1rem;                   /* Comfortable spacing */
+    margin: 1rem 0;                  /* Vertical separation from content */
+    display: flex;                   /* Flexible layout for responsiveness */
+    justify-content: space-between;  /* Spread info and actions apart */
+    align-items: center;             /* Vertically center content */
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Action button groups within the operation bars */
+.batch-actions, .changes-actions {
+    display: flex;                   /* Horizontal button layout */
+    gap: 0.5rem;                    /* Consistent spacing between buttons */
+    align-items: center;             /* Align buttons vertically */
+}
+
+.batch-info, .changes-info {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.form-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    min-width: 200px;
+}
+
+/* =============================================================================
+   FOOD ITEM CARDS
+   ============================================================================= */
+
+/* 
+INDIVIDUAL FOOD ITEM STYLING
+Each card represents one food item with interactive elements.
+Positioned relatively to allow absolute positioning of checkboxes.
+*/
+.food-item-card {
+    position: relative;              /* Allow absolute positioning of children */
+    border: 1px solid #dee2e6;     /* Consistent border with operation bars */
+    border-radius: 8px;             /* Matching rounded corners */
+    padding: 1rem;                  /* Comfortable internal spacing */
+    margin-bottom: 1rem;            /* Vertical separation between cards */
+    background: var(--surface-color);
+}
+
+/* Checkbox positioning for easy access without interfering with content */
+.food-item-checkbox {
+    position: absolute;              /* Position independently of content flow */
+    top: 0.5rem;                    /* Small offset from top edge */
+    left: 0.5rem;                   /* Small offset from left edge */
+}
+
+.food-item-checkbox input[type="checkbox"] {
+    margin: 0;
+}
+
+/* Header section with title and bulk selection control */
+.section-header {
+    display: flex;                   /* Flexible layout */
+    justify-content: space-between;  /* Title left, controls right */
+    align-items: center;             /* Vertically center elements */
+    margin-bottom: 1rem;            /* Space before food items */
+}
+
+.bulk-select label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.food-item-header {
+    margin-bottom: 1rem;
+    padding-left: 2rem; /* Space for checkbox */
+}
+
+.food-item-header h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-color);
+}
+
+.food-category {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.food-item-details {
+    padding-left: 2rem; /* Space for checkbox */
+    margin-bottom: 1rem;
+}
+
+.food-item-details p {
+    margin: 0.5rem 0;
+    color: var(--text-color);
+}
+
+.food-item-actions {
+    padding-left: 2rem; /* Space for checkbox */
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* =============================================================================
+   QUANTITY CONTROLS
+   ============================================================================= */
+
+/* 
+INTERACTIVE QUANTITY ADJUSTMENT
+Provides intuitive +/- controls for modifying quantities.
+Designed for both mouse and touch interaction.
+*/
+.quantity-controls {
+    display: flex;                   /* Horizontal layout for label and controls */
+    align-items: center;             /* Vertically center all elements */
+    gap: 0.5rem;                    /* Spacing between label and controls */
+    margin-bottom: 0.5rem;          /* Space before next detail item */
+}
+
+/* Container for the +/- buttons and quantity display */
+.quantity-adjuster {
+    display: flex;                   /* Horizontal button layout */
+    align-items: center;             /* Vertically center elements */
+    gap: 0.5rem;                    /* Consistent spacing */
+}
+
+/* 
+QUANTITY ADJUSTMENT BUTTONS
+Styled for clear interaction feedback and accessibility.
+Sized for easy touch/click targeting.
+*/
+.qty-btn {
+    background: #007bff;             /* Primary blue for action buttons */
+    color: white;                    /* High contrast text */
+    border: none;                    /* Clean, borderless design */
+    border-radius: 4px;             /* Slightly rounded for softness */
+    width: 24px;                    /* Fixed size for consistency */
+    height: 24px;                   /* Square aspect ratio */
+    display: flex;                   /* Center the icon/text */
+    align-items: center;             /* Vertical centering */
+    justify-content: center;         /* Horizontal centering */
+    cursor: pointer;                 /* Indicate interactivity */
+    font-size: 14px;               /* Readable icon size */
+    font-weight: bold;              /* Strong visual presence */
+}
+
+/* Hover state for better user feedback */
+.qty-btn:hover {
+    background: #0056b3;            /* Darker blue on hover */
+}
+
+/* Quantity display styling for readability */
+.quantity-display {
+    min-width: 30px;                /* Prevent layout shift with different numbers */
+    text-align: center;             /* Center the number */
+    font-weight: bold;              /* Emphasize the current value */
+}
+
+/* =============================================================================
+   STATUS INDICATORS & VISUAL FEEDBACK
+   ============================================================================= */
+
+/* 
+EXPIRATION STATUS COLOR CODING
+Visual indicators for food freshness using our minty theme colors.
+Provides immediate visual feedback about food status.
+*/
+.food-item-card.expired { 
+    border-left: 4px solid var(--danger-color);  /* Red border for expired items */
+    background-color: var(--danger-light); /* Light red background */
+}
+.food-item-card.warning { 
+    border-left: 4px solid var(--warning-color);  /* Orange border for expiring soon */
+    background-color: var(--warning-light); /* Light orange background */
+}
+.food-item-card.fresh { 
+    border-left: 4px solid var(--primary-color);  /* Mint green border for fresh items */
+    background-color: var(--primary-light); /* Light mint background */
+}
+
+/* Text color coding to match border indicators */
+.expired { 
+    color: var(--danger-color);   /* Dark red text for expired status */
+    font-weight: 600;
+}
+.warning { 
+    color: var(--warning-color); /* Dark orange for warning text */
+    font-weight: 600;
+}
+.fresh { 
+    color: var(--primary-color);     /* Green for fresh status */
+    font-weight: 500;
+}
+
+/* 
+SPECIAL STATUS TAGS
+Small badges for additional food properties like frozen status.
+Styled to be informative but not distracting.
+*/
+.frozen-tag { 
+    background: #e3f2fd;            /* Light blue background */
+    color: #1565c0;                 /* Dark blue text for contrast */
+    padding: 2px 6px;               /* Compact padding */
+    border-radius: 4px;             /* Rounded corners */
+    font-size: 0.8em;              /* Smaller than regular text */
+}
+
+.expiry-status {
+    margin: 0.5rem 0;
+}
+
+/* =============================================================================
+   MODAL STYLES
+   ============================================================================= */
+
+/* Modal overlay */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-btn:hover {
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* =============================================================================
+   LAYOUT COMPONENTS
+   ============================================================================= */
+
+.container-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.container-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.food-items-section {
+    margin-bottom: 2rem;
+}
+
+.food-items-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    background: var(--surface-color);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--border-color);
+}
+
+.back-section {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .container-detail {
+        padding: 1rem;
+    }
+    
+    .header-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .container-actions {
+        justify-content: center;
+    }
+    
+    .batch-operations, .quantity-changes {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .batch-actions, .changes-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .food-item-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+}
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(-100%); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
